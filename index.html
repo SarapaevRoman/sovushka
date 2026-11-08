@@ -1,0 +1,1631 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#7A5CF0">
+<meta name="description" content="Совушкина школа — сказки, задания, правила и энциклопедия для 1–2 класса">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head><body>
+<title>Совушкина школа</title>
+<style>
+/* Layout: one-column game screens (home → map of 7 islands → task), bright single-theme "sunny sky" look */
+:root{
+  --sky:#E3F4FF; --sky2:#C9E9FF; --card:#FFFFFF; --ink:#23305E; --muted:#5D6B93;
+  --sun:#FFC83D; --coral:#FF6F61; --mint:#1FB59B; --grape:#7A5CF0; --berry:#E2457F;
+  --ok:#1FA36B; --okbg:#DDF7EA; --bad:#E5484D; --badbg:#FFE6E6; --hintbg:#FFF4CF;
+  --display:"Comfortaa","Trebuchet MS","Segoe UI",sans-serif;
+  --body:"Nunito","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--sky);color:var(--ink)}
+body{font-family:var(--body);font-size:18px;line-height:1.45;padding-inline:16px;padding-block:0 40px;
+  background:radial-gradient(circle at 15% 8%,#fff 0 60px,transparent 61px),radial-gradient(circle at 85% 4%,#fff 0 40px,transparent 41px),var(--sky);background-attachment:scroll}
+.wrap{max-width:720px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible{outline:3px solid var(--grape);outline-offset:2px}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:10px;padding-block:10px;background:var(--sky)}
+.back{width:44px;height:44px;border-radius:50%;background:var(--card);font-size:22px;font-weight:800;box-shadow:0 3px 0 var(--sky2)}
+.bar h1{flex:1;font-size:20px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbtn{height:44px;border-radius:999px;padding:0 14px;background:var(--card);font-weight:800;box-shadow:0 3px 0 var(--sky2);white-space:nowrap}
+.vbtn.on{background:var(--sun);box-shadow:0 3px 0 #D9A21E}
+.sayb{border-radius:999px;padding:6px 12px;font-weight:800;font-size:15px;background:#EAF4FF;box-shadow:0 2px 0 var(--sky2);margin-left:6px;vertical-align:middle}
+.owl{cursor:pointer}
+.pill{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:999px;padding:6px 14px;font-weight:800;box-shadow:0 3px 0 var(--sky2);white-space:nowrap}
+.pill .s{color:var(--sun);font-size:22px;line-height:1}
+
+/* owl */
+.owlrow{display:flex;align-items:flex-end;gap:12px;margin-block:8px 18px}
+.owl{flex:0 0 auto;width:92px;height:92px}
+.owl.small{width:58px;height:58px}
+.bubble{position:relative;background:var(--card);border-radius:22px;padding:14px 16px;font-weight:700;box-shadow:0 4px 0 var(--sky2);min-width:0}
+.bubble:before{content:"";position:absolute;left:-10px;bottom:18px;border:10px solid transparent;border-right-color:var(--card);border-left:0}
+
+/* home */
+.big{display:grid;gap:14px}
+.bigbtn{display:flex;align-items:center;gap:16px;text-align:left;border-radius:26px;padding:20px;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.15);transition:transform .1s}
+.bigbtn:active{transform:translateY(3px);box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.bigbtn .ic{flex:0 0 auto;width:64px;height:64px;border-radius:20px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-size:36px}
+.bigbtn h2{font-size:24px}
+.bigbtn p{margin:2px 0 0;font-weight:700;opacity:.95}
+.b-play{background:var(--coral)} .b-learn{background:var(--mint)}
+
+/* map */
+.map{display:grid;gap:14px;padding-block:6px}
+.isl{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:24px;padding:14px 16px;text-align:left;box-shadow:0 5px 0 var(--sky2);width:min(100%,520px)}
+.isl:nth-child(even){margin-left:auto}
+.isl .num{flex:0 0 auto;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-size:26px;font-weight:700;color:#fff}
+.isl .t{font-weight:800;font-size:19px}
+.isl .st{color:var(--sun);font-size:20px;letter-spacing:2px}
+.isl .st i{color:#D6E4F0;font-style:normal}
+.isl.done{outline:3px solid var(--sun)}
+
+/* task screen */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.tab{flex:1 1 0;min-width:96px;background:var(--card);border-radius:16px;padding:8px 10px;font-weight:800;font-size:15px;box-shadow:0 3px 0 var(--sky2);text-align:center}
+.tab.on{background:var(--ink);color:#fff;box-shadow:none}
+.tab small{display:block;color:var(--sun);font-size:14px;letter-spacing:1px}
+.card{background:var(--card);border-radius:26px;padding:18px;box-shadow:0 6px 0 var(--sky2)}
+.tag{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;border-radius:999px;padding:4px 12px;margin-bottom:8px}
+.tag.att{background:var(--coral)} .tag.wit{background:var(--grape)} .tag.trk{background:var(--berry)}
+.card h2{font-size:24px;margin-bottom:8px}
+.explain{background:#EAF4FF;border-radius:18px;padding:12px 14px;margin-block:10px;font-weight:600}
+.do{font-weight:800;margin-block:12px 8px}
+.hints{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.hbtn{flex:1 1 140px;border-radius:16px;padding:12px;font-weight:800;background:var(--hintbg);box-shadow:0 3px 0 #F2D98A}
+.hbtn.help{background:#EFE9FF;box-shadow:0 3px 0 #D4C9FA}
+.hbtn[disabled]{opacity:.5;cursor:default}
+.hintbox{margin-top:12px;border-radius:16px;padding:12px 14px;font-weight:700;background:var(--hintbg)}
+.hintbox.help{background:#EFE9FF}
+.msg{min-height:28px;font-weight:800;margin-top:10px}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+
+/* hunt */
+.letters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-block:10px}
+.lt{width:46px;height:52px;border-radius:14px;background:#F2F7FC;font-family:var(--display);font-size:26px;font-weight:700;box-shadow:0 3px 0 #D7E4F1;position:relative}
+.lt.g0{background:#FFE3DF;color:var(--coral)}
+.lt.g0:after{content:"";position:absolute;left:8px;right:8px;top:50%;height:4px;border-radius:2px;background:var(--coral);transform:rotate(-20deg)}
+.lt.g1{background:#E3DBFF;color:var(--grape);box-shadow:inset 0 0 0 4px var(--grape)}
+.lt.flash{animation:flash .5s 3}
+@keyframes flash{50%{background:var(--sun)}}
+.counter{text-align:center;font-weight:800;font-size:20px}
+
+/* chain / collect */
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-block:10px}
+.word{font-family:var(--display);font-weight:700;font-size:22px;background:#F2F7FC;border-radius:14px;padding:8px 12px}
+.arr{font-weight:800;color:var(--muted)}
+input.w{font:inherit;font-weight:800;font-size:20px;width:120px;padding:9px 12px;border-radius:14px;border:3px solid #CFE0F0;background:#fff;color:var(--ink);text-transform:lowercase}
+input.w.okk{border-color:var(--ok);background:var(--okbg)}
+input.w.badd{border-color:var(--bad);background:var(--badbg)}
+.go{border-radius:14px;padding:10px 18px;font-weight:800;background:var(--mint);color:#fff;box-shadow:0 3px 0 #168a76}
+.group{border-top:2px dashed #DCE8F4;padding-top:12px;margin-top:12px}
+.group:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.glab{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.12em;word-break:break-all;background:#FFF8DD;border-radius:14px;padding:8px 12px;display:inline-block}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:var(--okbg);color:var(--ok);font-weight:800;border-radius:999px;padding:4px 12px}
+.prog{font-weight:800;color:var(--muted);font-size:15px}
+
+/* choice */
+.pair{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-block:10px;border-top:2px dashed #DCE8F4}
+.pair:first-child{border-top:0}
+.pw{font-family:var(--display);font-weight:700;font-size:21px;flex:1 1 220px;min-width:0}
+.pw b{color:var(--bad);text-decoration:underline}
+.opt{border-radius:14px;padding:10px 14px;font-weight:800;background:#F2F7FC;box-shadow:0 3px 0 #D7E4F1;text-align:left}
+.opt.right{background:var(--okbg);color:var(--ok);box-shadow:0 3px 0 #9fdcbc}
+.opt.wrong{background:var(--badbg);color:var(--bad)}
+.q{padding-block:12px;border-top:2px dashed #DCE8F4}
+.q:first-child{border-top:0}
+.q p{font-weight:800;margin:0 0 8px}
+.opts{display:grid;gap:8px}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* error text */
+.etext{display:flex;flex-wrap:wrap;gap:6px;font-size:21px;line-height:1.3}
+.tok{border-radius:10px;padding:4px 7px;background:#F2F7FC;font-weight:700}
+.tok.fixed{background:var(--okbg);color:var(--ok)}
+.tok.fixed s{color:var(--bad);font-weight:600;margin-right:4px}
+.memo{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-block:12px}
+.memo span{background:#FFF8DD;border-radius:14px;padding:8px 14px;font-weight:800;font-size:20px}
+
+/* learn */
+.subj{display:flex;gap:8px;margin-bottom:14px}
+.subj button{flex:1;border-radius:18px;padding:12px;font-weight:800;background:var(--card);box-shadow:0 3px 0 var(--sky2)}
+.subj button.on{background:var(--mint);color:#fff;box-shadow:0 3px 0 #168a76}
+.subj button.on.m{background:var(--grape);box-shadow:0 3px 0 #5a40c7}
+.topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.tp{background:var(--card);border-radius:20px;padding:14px;text-align:left;font-weight:800;box-shadow:0 4px 0 var(--sky2);display:flex;gap:10px;align-items:center}
+.tp .n{flex:0 0 auto;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:var(--display)}
+.tp.ru .n{background:var(--mint)} .tp.ma .n{background:var(--grape)}
+.tp .ck{margin-left:auto;color:var(--ok)}
+.lesson p{margin:0 0 10px;font-size:19px}
+.example{background:#FFF8DD;border-radius:18px;padding:12px 14px;font-weight:700;margin-block:12px}
+.example b{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#B38300;margin-bottom:4px}
+.listen{border-radius:14px;padding:10px 16px;font-weight:800;background:#EAF4FF;box-shadow:0 3px 0 var(--sky2)}
+
+/* party */
+.party{position:fixed;inset:0;z-index:20;background:rgba(35,48,94,.55);display:grid;place-items:center;padding:16px}
+.pbox{background:var(--card);border-radius:30px;padding:26px 22px;text-align:center;max-width:380px;width:100%}
+.pbox h2{font-size:30px;margin-block:6px}
+.pstars{font-size:52px;letter-spacing:6px;color:var(--sun)}
+.pstars i{color:#D6E4F0;font-style:normal}
+.pstars span{display:inline-block;animation:pop .5s both}
+.pstars span:nth-child(2){animation-delay:.15s}.pstars span:nth-child(3){animation-delay:.3s}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.pbox .go{margin-top:14px;font-size:20px;padding:12px 26px}
+
+/* ---- tale ---- */
+.blot.eraser{background:#F58BB0;border-radius:14px 14px 20px 20px;box-shadow:inset 0 calc(var(--s)*-.3) 0 #4F7BD9}
+.blot.eraser .hat{border-bottom-color:#4F7BD9}
+.bpart{display:block;font-weight:800;opacity:.9;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.bprog{font-size:14px;margin-top:6px!important;background:rgba(255,255,255,.22);display:inline-block;border-radius:999px;padding:2px 10px}
+.b-tale{background:var(--grape)} .b-ref{background:var(--mint)}
+.owl.mini{width:46px;height:46px}
+.tpath{display:grid;gap:12px;position:relative;padding-block:4px}
+.tpath:before{content:"";position:absolute;left:43px;top:20px;bottom:20px;border-left:4px dotted #B9D3EA}
+.tnode{position:relative;display:flex;align-items:center;gap:14px;background:var(--card);border-radius:22px;padding:12px 14px;text-align:left;box-shadow:0 5px 0 var(--sky2)}
+.tnode.locked{opacity:.6}
+.tnode.done{box-shadow:0 5px 0 #F2D98A}
+.ticon{flex:0 0 auto;width:58px;height:58px;border-radius:18px;display:grid;place-items:center;font-size:30px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.tinfo{min-width:0;display:flex;flex-direction:column}
+.tinfo small{color:var(--muted);font-weight:800;font-size:13px}
+.tinfo b{font-family:var(--display);font-size:19px}
+.tinfo .st{color:var(--sun);font-size:19px;letter-spacing:2px}
+.tinfo .st i{color:#D6E4F0;font-style:normal}
+.tinfo em{font-style:normal;color:var(--grape);font-size:15px;letter-spacing:0;font-weight:800}
+.tnode.locked em{color:var(--muted)}
+.chead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.chead .cnum{width:40px;height:40px;border-radius:14px;color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:20px;flex:0 0 auto}
+.chead b{display:block;font-family:var(--display)}
+.chead small{color:var(--muted);font-weight:800}
+.scene{display:flex;gap:14px;align-items:flex-start;background:var(--card);border-radius:26px;padding:18px;border-top:8px solid var(--grape);box-shadow:0 6px 0 var(--sky2);animation:rise .35s both}
+.scene.bad{background:#F3EEFF}
+@keyframes rise{from{transform:translateY(12px);opacity:.3}}
+.por{flex:0 0 auto;width:72px;height:72px;border-radius:22px;background:#F2F7FC;display:grid;place-items:center;font-size:44px;line-height:1}
+.stext{min-width:0;flex:1}
+.sname{font-weight:800;color:var(--muted);font-size:14px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.stext p{margin:6px 0 0;font-size:21px;line-height:1.4;font-weight:700}
+.snav{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.dots{display:flex;gap:6px}
+.dots span{width:10px;height:10px;border-radius:50%;background:#C9DDF0}
+.dots span.on{background:var(--grape)}
+.go.big{font-size:20px;padding:13px 24px}
+.arena{background:#FFF8E8;border:4px solid var(--grape);border-radius:26px;padding:14px;margin-bottom:14px;position:relative;text-align:center}
+.aintro{font-weight:800;margin-bottom:10px}
+.stage{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;min-height:70px}
+.blot{--s:52px;width:var(--s);height:calc(var(--s)*.9);background:#2E1F52;border-radius:58% 42% 52% 48%/55% 48% 52% 45%;position:relative;display:inline-block;flex:0 0 auto;animation:wob 2.2s ease-in-out infinite}
+.blot:before,.blot:after{content:"";position:absolute;top:30%;width:24%;height:30%;border-radius:50%;background:radial-gradient(circle at 55% 62%,#23305E 0 32%,#fff 35%)}
+.blot:before{left:20%}.blot:after{right:20%}
+.blot .hat{position:absolute;left:50%;bottom:80%;transform:translateX(-50%);width:0;height:0;border-left:calc(var(--s)*.26) solid transparent;border-right:calc(var(--s)*.26) solid transparent;border-bottom:calc(var(--s)*.5) solid #6B3FA0}
+.blot.mini{--s:46px;margin-top:14px}
+.blot.big{--s:118px;margin-top:40px}
+.blot:nth-child(2n){animation-delay:-.7s}.blot:nth-child(3n){animation-delay:-1.3s}
+@keyframes wob{50%{transform:scale(1.06,.94)}}
+.blot.gone{animation:splat .7s forwards}
+@keyframes splat{40%{transform:scale(1.35,.55)}100%{transform:translateY(-70px) scale(0) rotate(40deg);opacity:0}}
+.blot.hit{animation:hit .45s}
+@keyframes hit{30%{transform:translateX(-10px) rotate(-8deg);filter:brightness(2.2)}65%{transform:translateX(10px) rotate(6deg)}}
+.slots{gap:8px}
+.slot{width:50px;height:50px;border-radius:14px;border:3px dashed #D9C9A8;display:grid;place-items:center;font-size:30px;background:#fff}
+.slot.full{border-style:solid;border-color:var(--sun);background:#FFF1C2;animation:pop .45s both}
+.slot.plank{width:44px;height:64px;border-radius:8px}
+.slot.plank.full{background:repeating-linear-gradient(90deg,#B07A45 0 6px,#A26C3A 6px 8px);border-color:#7A4E25}
+.slot.stone{border-radius:6px}
+.slot.stone.full{background:linear-gradient(#B9C2D0,#8C97A8);border-color:#6E7889}
+.lockst{flex-direction:column}
+.cage{width:110px;height:110px;border-radius:55px 55px 14px 14px;display:grid;place-items:center;font-size:56px;background:repeating-linear-gradient(90deg,transparent 0 12px,#8A6A3E 12px 16px),#FFF1C2;border:4px solid #8A6A3E;transition:all .5s}
+.cage.free{background:#DDF7EA;border-color:var(--ok)}
+.cage.free .npc{animation:jump .6s 3}
+@keyframes jump{50%{transform:translateY(-16px)}}
+.npc{display:inline-block}
+.locks{display:flex;gap:8px;font-size:30px}
+.lock.open{animation:pop .4s both}
+.boss{flex-direction:column}
+.hearts{display:flex;gap:6px;font-size:30px;color:var(--bad)}
+.heart.lost{color:#D6E4F0;transform:scale(.8)}
+.taunt{display:inline-block;margin-top:10px;background:#2E1F52;color:#fff;font-weight:800;border-radius:16px;padding:6px 12px;font-size:15px;visibility:hidden}
+.taunt.on{visibility:visible;animation:pop .3s both}
+.qcard .qtext{font-family:var(--display);font-weight:700;font-size:22px;margin:6px 0 12px}
+.qhead{display:flex;justify-content:space-between}
+.qopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px}
+.opt.big{font-size:22px;text-align:center;padding:14px 10px;font-family:var(--display)}
+.opt[disabled]{cursor:default}
+.center{text-align:center}
+.center .owl{margin:0 auto}
+.cert{background:var(--card);border-radius:26px;padding:24px 18px;text-align:center;border:8px double var(--sun);box-shadow:0 6px 0 var(--sky2)}
+.cert .ctop{font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-size:13px}
+.cert h2{font-size:40px;color:var(--grape);margin:6px 0}
+.cert p{font-weight:700;margin:8px 0}
+.cert input.w{width:min(100%,260px);text-align:center;font-size:24px}
+.cert .owl{margin:8px auto 0}
+.cert .sig{color:var(--muted);font-style:italic}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:440px){body{font-size:17px}.lt{width:40px;height:46px;font-size:22px}input.w{width:104px}.bigbtn h2{font-size:21px}}
+
+/* ---- fact of the day ---- */
+.fact{position:relative;display:block;width:100%;text-align:left;background:linear-gradient(135deg,#FFF6D6,#FFE8F1);border-radius:26px;padding:16px 16px 14px;margin-bottom:16px;box-shadow:0 6px 0 #F2D2A6;border:3px solid #FFD36B}
+.fact .fk{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#B36B00;display:flex;align-items:center;gap:6px}
+.fact .fh{display:flex;gap:12px;align-items:flex-start;margin-top:8px}
+.fact .fe{flex:0 0 auto;font-size:46px;line-height:1;width:64px;height:64px;display:grid;place-items:center;background:#fff;border-radius:20px;box-shadow:0 3px 0 #F2D2A6}
+.fact h3{font-size:20px;margin-bottom:4px}
+.fact p{margin:0;font-weight:700;font-size:18px}
+.fact .frow{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.fbtn{border-radius:14px;padding:10px 14px;font-weight:800;background:#fff;box-shadow:0 3px 0 #F2D2A6}
+.fbtn.main{background:var(--grape);color:#fff;box-shadow:0 3px 0 #5a40c7}
+.fbtn.speaking{background:var(--sun);color:var(--ink);box-shadow:0 3px 0 #D9A21E}
+.b-enc{background:#1C8FD6} .b-set{background:#fff;color:var(--ink)}
+.b-set .ic{background:#EAF4FF}
+/* ---- encyclopedia ---- */
+.secs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.sec{border-radius:22px;padding:14px;color:#fff;text-align:left;box-shadow:0 5px 0 rgba(0,0,0,.18);display:flex;flex-direction:column;gap:4px;min-height:118px}
+.sec .se{font-size:38px;line-height:1}
+.sec b{font-family:var(--display);font-size:18px}
+.sec small{font-weight:800;opacity:.9}
+.encbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.encbar input{flex:1 1 200px;min-width:0;font:inherit;font-weight:700;padding:11px 14px;border-radius:16px;border:3px solid #CFE0F0;background:#fff;color:var(--ink)}
+.flist{display:grid;gap:10px}
+.fi{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:12px 14px;text-align:left;box-shadow:0 4px 0 var(--sky2)}
+.fi .fe{flex:0 0 auto;font-size:30px;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#F2F7FC}
+.fi b{font-size:17px;font-weight:800}
+.fi .ck{margin-left:auto;color:var(--ok);font-weight:800}
+.fpage{background:var(--card);border-radius:26px;padding:18px;box-shadow:0 6px 0 var(--sky2)}
+.fpage .big-e{font-size:72px;line-height:1;text-align:center;margin:4px 0 6px}
+.fpage h2{font-size:25px;text-align:center;margin-bottom:6px}
+.chipsec{display:block;width:max-content;margin:0 auto 12px;color:#fff;font-weight:800;font-size:13px;border-radius:999px;padding:4px 12px}
+.short{font-size:20px;font-weight:700;background:#FFF8DD;border-radius:18px;padding:12px 14px}
+.more{margin-top:12px;font-size:19px;line-height:1.55}
+.more span,.short span{border-radius:6px;transition:background .2s}
+.more span.now,.short span.now{background:#FFE48A}
+.frow2{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.fnav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.fnav button{flex:1}
+/* ---- voice settings ---- */
+.vlist{display:grid;gap:8px;margin-top:10px}
+.vi{display:flex;align-items:center;gap:10px;background:#F2F7FC;border-radius:16px;padding:11px 14px;text-align:left;font-weight:800}
+.vi.on{background:var(--okbg);box-shadow:inset 0 0 0 3px var(--ok)}
+.vi small{display:block;font-weight:700;color:var(--muted);font-size:13px}
+.vi .star{color:#D9A21E;font-size:20px}
+.range{width:100%;accent-color:var(--grape)}
+.note{background:#EAF4FF;border-radius:18px;padding:12px 14px;font-weight:600;font-size:16px;margin-top:12px}
+.note b{font-weight:800}
+.instbtn{width:100%;margin-top:14px}
+</style>
+
+<div class="wrap">
+  <div class="bar">
+    <button class="back" id="back" aria-label="Назад" hidden>‹</button>
+    <h1 id="ttl">Совушкина школа</h1>
+    <button class="vbtn" id="voice" aria-pressed="false">🔇 Молчит</button>
+    <div class="pill" title="Мои звёзды"><span class="s">★</span><span id="total">0</span></div>
+  </div>
+  <main id="screen"></main>
+</div>
+<div class="party" id="party" hidden>
+  <div class="pbox">
+    <div id="powl"></div>
+    <h2 id="ptitle">Молодец!</h2>
+    <div class="pstars" id="pstars"></div>
+    <p id="ptext" style="font-weight:700;margin:6px 0 0"></p>
+    <button class="go" id="pnext">Дальше</button>
+  </div>
+</div>
+
+<script src="enc.js"></script>
+<script>
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+const norm = s => (s || '').toLowerCase().replace(/ё/g, 'е').replace(/[^а-яa-z]/g, '');
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const oneDiff = (a, b) => { a = norm(a); b = norm(b); if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) d++; return d === 1; };
+const shakeIt = e => { e.classList.remove('shake'); void e.offsetWidth; e.classList.add('shake'); };
+const OWL = `<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M22 30 L30 8 L42 24 Z M78 30 L70 8 L58 24 Z" fill="#8C5A3C"/><ellipse cx="50" cy="58" rx="36" ry="38" fill="#A86B47"/><ellipse cx="50" cy="68" rx="22" ry="24" fill="#F5D7B5"/><circle cx="35" cy="42" r="14" fill="#fff"/><circle cx="65" cy="42" r="14" fill="#fff"/><circle cx="37" cy="43" r="7" fill="#23305E"/><circle cx="63" cy="43" r="7" fill="#23305E"/><circle cx="39" cy="40" r="2.5" fill="#fff"/><circle cx="65" cy="40" r="2.5" fill="#fff"/><path d="M45 54 L55 54 L50 63 Z" fill="#FFC83D"/><path d="M28 70 q8 6 0 14 M72 70 q-8 6 0 14" stroke="#8C5A3C" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="30" y="2" width="40" height="6" rx="2" fill="#23305E" transform="rotate(-6 50 5)"/><rect x="44" y="-2" width="12" height="8" rx="2" fill="#23305E" transform="rotate(-6 50 5)"/></svg>`;
+const owl = (cls = '') => `<div class="owl ${cls}">${OWL}</div>`;
+const PRAISE = ['Ура! Получилось!', 'Молодец!', 'Умница!', 'Здорово!', 'Отлично!', 'Супер!'];
+const TRY = ['Почти! Попробуй ещё раз.', 'Не спеши, посмотри внимательно.', 'Ничего страшного, ещё попытка!'];
+const pick = a => a[Math.floor(Math.random() * a.length)];
+
+let audio;
+function ding(good) {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = 'triangle'; o.frequency.value = good ? 660 : 220;
+    if (good) o.frequency.setValueAtTime(880, audio.currentTime + 0.09);
+    g.gain.setValueAtTime(0.15, audio.currentTime); g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + 0.3);
+    o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + 0.3);
+  } catch (e) {}
+}
+let VOICE = false;
+try { VOICE = localStorage.getItem('sova-voice') === '1'; } catch (e) {}
+const clean = t => String(t).replace(/<[^>]+>/g, ' ').replace(/[→]/g, ', ').replace(/[★☆💡🦉🔊🔇✔✎‹›]/g, '').replace(/\s+/g, ' ').trim();
+/* «Живой» голос: как в переводчике — выбираем лучший русский голос устройства
+   (нейросетевые Natural/Online в Edge, сетевые голоса Google в Chrome/Android). */
+const VS = { name: '', rate: 0.95 };
+try { const o = JSON.parse(localStorage.getItem('sova-vset') || '{}'); if (o.name) VS.name = o.name; if (o.rate) VS.rate = o.rate; } catch (e) {}
+const saveVS = () => { try { localStorage.setItem('sova-vset', JSON.stringify(VS)); } catch (e) {} };
+function ruVoices() {
+  try { return speechSynthesis.getVoices().filter(v => /^ru/i.test(v.lang) || /russian|русск/i.test(v.name)); } catch (e) { return []; }
+}
+function voiceScore(v) {
+  let sc = 0;
+  if (/natural|neural|online|premium|enhanced|wavenet/i.test(v.name)) sc += 10;
+  if (/google/i.test(v.name)) sc += 6;
+  if (/network|-network/i.test(v.name + v.voiceURI)) sc += 4;
+  if (v.localService === false) sc += 3;
+  if (/svetlana|dariya|milena|alena|ruf|rug|rue/i.test(v.name + v.voiceURI)) sc += 1;
+  return sc;
+}
+const isLive = v => voiceScore(v) >= 6;
+function bestVoice() {
+  const vs = ruVoices(); if (!vs.length) return null;
+  if (VS.name) { const c = vs.find(v => v.name === VS.name); if (c) return c; }
+  return vs.slice().sort((a, b) => voiceScore(b) - voiceScore(a))[0];
+}
+try { speechSynthesis.onvoiceschanged = () => { if (typeof onVoicesReady === 'function') onVoicesReady(); }; speechSynthesis.getVoices(); } catch (e) {}
+/* Длинный текст читаем по предложениям: так Chrome не обрывает речь, а мы можем подсвечивать предложение. */
+const splitSent = t => (clean(t).match(/[^.!?…]+[.!?…»"]*\s*/g) || [clean(t)]).map(x => x.trim()).filter(Boolean);
+let SPK = 0;
+function stopSay() { SPK++; try { speechSynthesis.cancel(); } catch (e) {} }
+function sayParts(parts, onPart, onEnd) {
+  try {
+    const s = window.speechSynthesis; if (!s || !window.SpeechSynthesisUtterance) return false;
+    stopSay(); const my = SPK, v = bestVoice();
+    let i = 0;
+    const next = () => {
+      if (my !== SPK) return;
+      if (i >= parts.length) { onPart && onPart(-1); onEnd && onEnd(); return; }
+      const u = new SpeechSynthesisUtterance(parts[i]);
+      u.lang = 'ru-RU'; u.rate = VS.rate; u.pitch = 1.05; if (v) u.voice = v;
+      const idx = i; let done = false;
+      const fin = () => { if (done) return; done = true; i++; next(); };
+      u.onstart = () => { if (my === SPK) onPart && onPart(idx); };
+      u.onend = fin; u.onerror = e => { if (e && e.error === 'interrupted') return; fin(); };
+      s.speak(u);
+      if (s.paused) s.resume();
+    };
+    next(); return true;
+  } catch (e) { return false; }
+}
+function say(text, onPart, onEnd) { return sayParts(splitSent(text), onPart, onEnd); }
+function speak(text) { if (VOICE) say(text); }
+function setVoice(on) {
+  VOICE = on; try { localStorage.setItem('sova-voice', on ? '1' : '0'); } catch (e) {}
+  const b = $('#voice'); b.textContent = on ? '🔊 Говорит' : '🔇 Молчит'; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+  if (on) { if (!say('Привет! Теперь я буду говорить. Нажми на меня, если хочешь послушать ещё раз.')) { b.textContent = '🔇 Нет звука'; VOICE = false; } }
+  else stopSay();
+}
+function sayBtn(getText) { const b = el('button', 'sayb', '🔊'); b.setAttribute('aria-label', 'Послушать'); b.onclick = () => say(getText()); return b; }
+
+/* ---------- progress ---------- */
+let PROG = {}, LEARNED = {};
+try { PROG = JSON.parse(localStorage.getItem('sova-prog') || '{}'); LEARNED = JSON.parse(localStorage.getItem('sova-learn') || '{}'); } catch (e) {}
+const save = () => { try { localStorage.setItem('sova-prog', JSON.stringify(PROG)); localStorage.setItem('sova-learn', JSON.stringify(LEARNED)); } catch (e) {} };
+const totalStars = () => Object.values(PROG).reduce((a, b) => a + b, 0) + taleStars();
+const updTotal = () => { $('#total').textContent = totalStars(); };
+
+/* ---------- word lists for chains ---------- */
+const DICT = new Set(('кот кит рот рог рок ток сок сом ком кок лом лук луг бук жук сук бок док дом дым том ром лак мак бак рак сыр сор нос сон сад суп пол кол гол мех мир пир пар шар жар дар бал зал вал лес вес мох рис пух дух зуб дуб куб сын лад лев лед бор вор мол мял сок ' +
+  'гора нора кора пора нота нога рога роза коза кожа лужа тога сода').split(' ').map(norm));
+
+/* ---------- 7 days of tasks ---------- */
+const DAYS = [
+ { name: 'Понедельник', color: '#FF6F61', tasks: [
+  { kind: 'att', title: 'Охота на буквы', type: 'hunt', letters: 'АААКТОТМАДСРОААТАРОО', rounds: ['А', 'О'],
+    explain: 'Внимательный человек похож на охотника: смотрит медленно и ничего не пропускает. Веди пальчиком по строке слева направо и проверяй каждую букву.',
+    hint: 'Не прыгай глазами! Начни с самой первой буквы слева и иди по порядку, одна за другой.' },
+  { kind: 'wit', title: 'Цепочка слов', type: 'chain',
+    explain: 'Слово — это домик из кубиков-букв. За один ход можно поменять только один кубик, и каждый раз должно получаться настоящее слово. Например: КОТ → РОТ.',
+    chains: [{ from: 'ГОРА', to: 'НОГА', steps: 2 }, { from: 'ДОМ', to: 'СУК', steps: 2 }],
+    hint: 'ГОРА: поменяй первую букву. Где живёт лиса? А в слове ДОМ есть рыба с усами — СОМ.',
+    help: 'гора → нора → нота → нога. дом → сом → сок → сук.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Вопросы-хитрецы ловят тех, кто спешит. Дослушай вопрос до конца и подумай, что именно спрашивают.',
+    qs: [{ q: 'Что тяжелее: килограмм ваты или килограмм железа?', o: ['Железо', 'Вата', 'Одинаково'], a: 2 },
+         { q: 'В каких месяцах есть 28 дней?', o: ['Только в феврале', 'Во всех месяцах', 'Ни в каком'], a: 1 }],
+    hint: 'Килограмм — это всегда килограмм. А 28-е число есть в каждом месяце?',
+    help: 'Вес одинаковый — по килограмму. 28 дней есть во всех месяцах, просто в некоторых дней ещё больше.' }]},
+ { name: 'Вторник', color: '#FFB020', tasks: [
+  { kind: 'att', title: 'Спрятанные слова', type: 'collect',
+    explain: 'Слова спрятались в строке и прижались друг к другу без пробелов. Читай медленно, по кусочкам, и спрашивай себя: «А здесь нет слова?»',
+    groups: [{ label: 'ЕНОСУЛКОЗАРШАРВЫЛУНАК', accept: ['нос', 'коза', 'шар', 'луна'], need: 4 },
+             { label: 'ПАЛКАБЫСОВАТЕМЁДИЖУКЛ', accept: ['палка', 'сова', 'мёд', 'жук'], need: 4 }],
+    hint: 'В первой строке: часть лица, животное с рожками, игрушка и то, что светит ночью. Во второй: ветка, ночная птица, сладкое и насекомое.',
+    help: 'Первая строка: нос, коза, шар, луна. Вторая: палка, сова, мёд, жук.' },
+  { kind: 'wit', title: 'Волшебная буква', type: 'collect',
+    explain: 'Одна буква может превратить слово в совсем другое! Если поменять первую букву в слове ДОЧКА, получится БОЧКА.',
+    groups: [{ label: 'МАЙКА', accept: ['гайка', 'зайка', 'чайка', 'лайка', 'байка', 'сайка', 'шайка'], need: 3 },
+             { label: 'ДОЧКА', accept: ['бочка', 'точка', 'кочка', 'почка', 'ночка', 'мочка'], need: 3 }],
+    prompt: 'Меняй только первую букву. Найди по 3 новых слова.',
+    hint: 'МАЙКА: какая птица летает над морем? ДОЧКА: что ставят в конце предложения?',
+    help: 'майка → гайка, зайка, чайка, лайка. дочка → бочка, точка, кочка, почка.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Помни: вопрос-хитрец ловит тех, кто спешит. Прочитай его два раза.',
+    qs: [{ q: 'У трёх братьев есть по одной сестре. Сколько всего сестёр?', o: ['Три', 'Одна', 'Шесть'], a: 1 },
+         { q: 'Сколько яиц можно съесть натощак?', o: ['Одно', 'Два', 'Сколько хочешь'], a: 0 }],
+    hint: 'Может быть, у всех братьев одна и та же сестра? А «натощак» — это когда в животике пусто.',
+    help: 'Сестра одна на всех братьев. Натощак можно съесть только одно яйцо — после него живот уже не пустой.' }]},
+ { name: 'Среда', color: '#1FB59B', tasks: [
+  { kind: 'att', title: 'Одинаковые или нет?', type: 'same',
+    explain: 'Глаза любят торопиться: видят знакомое слово и думают, что всё правильно. А ошибка прячется в одной маленькой букве. Сравнивай слова по одной букве.',
+    pairs: [['заяц', 'заец'], ['медведь', 'медведь'], ['корова', 'карова'], ['огурец', 'огурец'], ['пенал', 'пинал'], ['яблоко', 'яблако']],
+    hint: 'Сравни первую букву с первой, вторую со второй — и так до конца слова.',
+    help: 'Одинаковые только «медведь» и «огурец». В остальных парах одна буква другая.' },
+  { kind: 'wit', title: 'Перепутанные буквы', type: 'collect',
+    explain: 'Буквы в слове можно переставить, как бусинки на нитке. Из тех же букв получится другое слово: из СОН получается НОС.',
+    groups: [{ label: 'БАНКА', accept: ['кабан'], need: 1 }, { label: 'СОСНА', accept: ['насос'], need: 1 },
+             { label: 'КУЛОН', accept: ['клоун'], need: 1 }, { label: 'ЛИПА', accept: ['пила'], need: 1 }],
+    prompt: 'Переставь буквы и получи новое слово.',
+    hint: 'БАНКА — дикий лесной зверь. СОСНА — им качают воду. КУЛОН — смешит в цирке. ЛИПА — ею пилят дрова.',
+    help: 'кабан, насос, клоун, пила.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Читай вопрос медленно — хитрецы любят прятать ловушку в одном слове.',
+    qs: [{ q: 'Шли две мамы и две дочки, а всего их было трое. Как так?', o: ['Это бабушка, мама и дочка', 'Кто-то спрятался', 'Так не бывает'], a: 0 },
+         { q: 'На берёзе выросло три яблока, одно упало. Сколько осталось?', o: ['Два', 'Три', 'На берёзе яблоки не растут'], a: 2 }],
+    hint: 'Мама тоже может быть чьей-то дочкой! А что растёт на берёзе?',
+    help: 'Бабушка — мама для мамы, а мама — дочка для бабушки. На берёзе яблоки не растут.' }]},
+ { name: 'Четверг', color: '#7A5CF0', tasks: [
+  { kind: 'att', title: 'Что изменилось?', type: 'changed',
+    explain: 'Посмотри на слова и постарайся их запомнить. Потом они изменятся — найди, что стало по-другому!',
+    rounds: [{ a: ['мама', 'папа', 'кот', 'собака', 'рыбка'], b: ['мама', 'папа', 'кот', 'рыбка'], o: ['Пропала собака', 'Пропал кот', 'Появилась мышка'], r: 0 },
+             { a: ['красный', 'синий', 'жёлтый', 'зелёный', 'белый'], b: ['красный', 'синий', 'зелёный', 'жёлтый', 'белый'], o: ['Пропал белый', 'Жёлтый и зелёный поменялись местами', 'Появился чёрный'], r: 1 },
+             { a: ['стол', 'стул', 'шкаф', 'диван', 'кровать', 'лампа'], b: ['стол', 'стул', 'шкаф', 'диван', 'кресло', 'лампа'], o: ['Пропала лампа', 'Шкаф стал полкой', 'Кровать стала креслом'], r: 2 }],
+    hint: 'Повтори слова про себя по порядку, как считалочку, прежде чем нажать «Запомнила!».',
+    help: '1) пропала собака; 2) жёлтый и зелёный поменялись местами; 3) кровать стала креслом.' },
+  { kind: 'wit', title: 'Слова в слове', type: 'collect',
+    explain: 'В одном длинном слове спрятано много коротких. Бери буквы из большого слова и собирай новые. Каждую букву можно взять столько раз, сколько она есть в большом слове.',
+    groups: [{ label: 'МАШИНА', accept: ['шина', 'мина', 'ниша', 'наш', 'нам', 'маша', 'миша', 'шина'], need: 4 }],
+    prompt: 'Составь 4 слова из букв слова МАШИНА.',
+    hint: 'Что надето на колесо? Как зовут девочку? «Это … дом» — чей?',
+    help: 'Подходят: шина, мина, ниша, наш, нам, Маша, Миша.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Хитрец может спрятать ошибку прямо в вопросе. Подумай: так вообще бывает?',
+    qs: [{ q: 'Петух снёс яйцо на крыше. В какую сторону оно покатится?', o: ['Вправо', 'Влево', 'Петухи не несут яйца'], a: 2 },
+         { q: 'Какое слово всегда пишется неправильно?', o: ['Слово «неправильно»', 'Слово «правильно»', 'Любое длинное'], a: 0 }],
+    hint: 'Кто несёт яйца — петух или курица? А во втором вопросе прочитай слова буквально.',
+    help: 'Яйца несут курицы, а не петухи. Слово «неправильно» всегда пишется именно так: «неправильно».' }]},
+ { name: 'Пятница', color: '#E2457F', tasks: [
+  { kind: 'att', title: 'Охота на Ш и Щ', type: 'hunt', letters: 'ЦЩШЖЩШЧЩЦШЩШЖЧШЩЦШ', rounds: ['Ш', 'Щ'],
+    explain: 'Буквы Ш и Щ очень похожи. У Щ есть маленький хвостик внизу. Смотри внимательно — хвостик легко пропустить!',
+    hint: 'Перед каждым нажатием посмотри вниз буквы: есть хвостик или нет?' },
+  { kind: 'wit', title: 'Убери одну букву', type: 'collect',
+    explain: 'Если из слова убрать одну букву, может получиться новое слово. Из слова ШУТКА выпрыгнула УТКА!',
+    groups: [{ label: 'ВОЛК', accept: ['вол'], need: 1 }, { label: 'СМЕХ', accept: ['мех'], need: 1 }, { label: 'ЗУБР', accept: ['зуб'], need: 1 },
+             { label: 'ПЛОТ', accept: ['пот', 'лот'], need: 1 }, { label: 'КРАСКА', accept: ['каска'], need: 1 }, { label: 'СЛОН', accept: ['сон'], need: 1 }],
+    prompt: 'Убери одну букву, чтобы получилось новое слово.',
+    hint: 'Попробуй убрать букву Л, Р или С — чаще всего лишняя именно она.',
+    help: 'вол, мех, зуб, пот, каска, сон.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Загадка-хитрец: подумай не о том, что кажется сразу, а о том, что подходит по правде.',
+    qs: [{ q: 'Чем больше из неё берёшь, тем больше она становится. Что это?', o: ['Куча', 'Яма', 'Тарелка'], a: 1 },
+         { q: 'Какой месяц самый короткий по названию?', o: ['Июнь', 'Март', 'Май'], a: 2 }],
+    hint: 'Что становится больше, когда копаешь лопатой? Посчитай буквы в названиях месяцев.',
+    help: 'Яма — чем больше земли берёшь, тем она больше. Май — всего три буквы.' }]},
+ { name: 'Суббота', color: '#2A9DF4', tasks: [
+  { kind: 'att', title: 'Найди ошибки', type: 'errors',
+    text: 'Мы с мамой пашли в лес. Там росли грибы и ягады. Под ёлкой сидел ёжык. Он пыхтел и шуршал листьями. Потом мы сели атдохнуть на пенёк.',
+    fix: { 'пашли': 'пошли', 'ягады': 'ягоды', 'ежык': 'ёжик', 'атдохнуть': 'отдохнуть' },
+    explain: 'Невнимательные ошибки прячутся в самых простых словах. Читай текст по слогам, так, как написано, и нажми на слова с ошибками.',
+    hint: 'Ошибок четыре. Проверь: «ЖИ пиши с И», и что слышно в слове, если сделать гласную громкой: ягоды — «ЯгОдка».',
+    help: 'Ошибки в словах: пашли, ягады, ёжык, атдохнуть.' },
+  { kind: 'wit', title: 'Цепочка слов', type: 'chain',
+    explain: 'Помнишь цепочки из понедельника? Меняй по одной букве, и каждый раз должно получаться настоящее слово.',
+    chains: [{ from: 'ЖУК', to: 'БАК', steps: 2 }, { from: 'КИТ', to: 'РОГ', steps: 2 }],
+    hint: 'ЖУК: поменяй первую букву — получится овощ, от которого плачут. КИТ: поменяй среднюю букву — получится домашний зверь.',
+    help: 'жук → лук → лак → бак. кит → кот → рот → рог.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Представь всё в голове как картинку — так хитрецу будет труднее тебя обмануть.',
+    qs: [{ q: 'У палки 2 конца. Сколько концов у двух с половиной палок?', o: ['5', '6', '4'], a: 1 },
+         { q: 'Какая цифра становится больше, если её перевернуть вверх ногами?', o: ['1', '8', '6'], a: 2 }],
+    hint: 'У половинки палки тоже два конца! А какая цифра вверх ногами становится другой цифрой?',
+    help: 'Две палки — 4 конца, половинка — ещё 2, всего 6. Цифра 6 вверх ногами становится 9.' }]},
+ { name: 'Воскресенье', color: '#FF8A3D', tasks: [
+  { kind: 'att', title: 'Охота на Б и Д', type: 'hunt', letters: 'БДДБВББДБДПБДВВДБББ', rounds: ['Б', 'Д'],
+    explain: 'Буквы Б и Д тоже иногда путаются. У Б хвостик смотрит вверх, а у Д есть ножки внизу.',
+    hint: 'Смотри, куда смотрит хвостик: вверх — это Б, ножки внизу — это Д.' },
+  { kind: 'wit', title: 'Слова в слове', type: 'collect',
+    explain: 'Чем длиннее слово, тем больше в нём спрятано маленьких слов!',
+    groups: [{ label: 'ПОДСНЕЖНИК', accept: ['сок', 'нос', 'сон', 'дно', 'нож', 'пик', 'кино', 'сноп', 'диск', 'пони', 'кед', 'носик', 'снежок', 'пенки', 'индекс', 'сено', 'окно'], need: 5 }],
+    prompt: 'Составь 5 слов из букв слова ПОДСНЕЖНИК.',
+    hint: 'Чем режут хлеб? Что пьют из фруктов? Какую лошадку катают дети?',
+    help: 'Подходят: нож, сок, пони, нос, сон, дно, кино, диск, снежок, носик.' },
+  { kind: 'trk', title: 'Хитрые вопросы', type: 'quiz',
+    explain: 'Последние хитрецы недели! Ты уже знаешь секрет: не торопись.',
+    qs: [{ q: 'Что можно приготовить, но нельзя съесть?', o: ['Кашу', 'Уроки', 'Суп'], a: 1 },
+         { q: 'Сколько горошин может войти в пустой стакан?', o: ['Десять', 'Сто', 'Ни одной — горошины не ходят'], a: 2 }],
+    hint: 'Что готовят дома после школы? А горошины умеют ходить?',
+    help: 'Уроки готовят, но их не едят. Горошины не ходят, их можно только насыпать.' }]}
+];
+
+/* ---------- Обучалка ---------- */
+const LEARN = {
+ ru: [
+  { t: 'Звуки и буквы', p: ['Звуки мы слышим и произносим. Буквы мы видим и пишем.', 'Звук — как песенка, а буква — её значок на бумаге. В русском алфавите 33 буквы.'], ex: 'В слове ЁЖ две буквы, а звуков три: [й] [о] [ш].', q: { q: 'Сколько букв в русском алфавите?', o: ['26', '33', '30'], a: 1 } },
+  { t: 'Гласные и согласные', p: ['Гласные звуки можно петь: а-а-а, о-о-о. Воздух выходит свободно.', 'Гласные буквы: А, О, У, Ы, Э, Я, Ё, Ю, И, Е.', 'Согласные петь не получится: воздуху мешают губы, зубы или язык. Например: Б, К, М, С.'], ex: 'В слове МАМА гласные — А и А, согласные — М и М.', q: { q: 'Какая буква гласная?', o: ['К', 'О', 'М'], a: 1 } },
+  { t: 'Слоги и перенос', p: ['Слог — это кусочек слова, который мы говорим на одном выдохе.', 'Сколько в слове гласных, столько и слогов.', 'Слова переносим по слогам. Одну букву нельзя ни оставлять на строке, ни переносить.'], ex: 'МА-ШИ-НА — три слога. Слово ЯМА не переносится: «я-ма» нельзя.', q: { q: 'Сколько слогов в слове СОБАКА?', o: ['2', '3', '4'], a: 1 } },
+  { t: 'Ударение', p: ['Один слог в слове мы говорим громче и дольше. Он называется ударным.', 'Ударение ставится только над гласной.', 'Чтобы найти ударение, позови слово, как будто зовёшь друга: «Ко-о-ошка!»'], ex: 'ворОна — ударный слог РО.', q: { q: 'Какой слог ударный в слове ВОРОНА?', o: ['ВО', 'РО', 'НА'], a: 1 } },
+  { t: 'Мягкий знак', p: ['Согласные бывают твёрдые и мягкие.', 'Мягкий знак Ь сам звука не обозначает. Он только делает согласную перед собой мягкой.', 'Без Ь слово может стать совсем другим!'], ex: 'МЕЛ — МЕЛЬ, УГОЛ — УГОЛЬ, БРАТ — БРАТЬ.', q: { q: 'В каком слове мягкий знак на конце?', o: ['кот', 'конь', 'дом'], a: 1 } },
+  { t: 'ЖИ-ШИ, ЧА-ЩА, ЧУ-ЩУ', p: ['Это самые важные правила-дружки.', 'ЖИ и ШИ пиши с буквой И.', 'ЧА и ЩА пиши с буквой А. ЧУ и ЩУ пиши с буквой У.', 'Даже если слышится по-другому, пиши по правилу!'], ex: 'лыжи, машина, чаща, щавель, чудо, щука.', q: { q: 'Как правильно?', o: ['шына', 'шина', 'шена'], a: 1 } },
+  { t: 'ЧК, ЧН, ЩН', p: ['В сочетаниях ЧК, ЧН, ЩН мягкий знак не пишется никогда.', 'Буквы Ч и Щ и так всегда мягкие, им помощник не нужен.'], ex: 'дочка, ночка, речной, мощный.', q: { q: 'Как правильно?', o: ['дочька', 'дочка'], a: 1 } },
+  { t: 'Большая буква', p: ['С большой буквы пишем начало предложения.', 'Ещё с большой буквы пишем имена, фамилии, клички животных, названия городов, рек и стран.'], ex: 'Маша и её кот Пушок живут в Москве у реки Волги.', q: { q: 'Что пишется с большой буквы?', o: ['река', 'Волга', 'город'], a: 1 } },
+  { t: 'Предложение', p: ['Предложение — это законченная мысль.', 'Оно начинается с большой буквы, а в конце стоит точка, вопросительный или восклицательный знак.', 'Читай вслух: где голос опускается и хочется сделать паузу — там конец предложения.'], ex: 'Зимой в лесу тихо. Под ёлкой спит ёжик.', q: { q: 'Что ставим в конце предложения-вопроса?', o: ['.', '?', ','], a: 1 } },
+  { t: 'Безударная гласная', p: ['В корне слова гласная без ударения может «прятаться»: пишем ВОДА, а слышим «вада».', 'Чтобы проверить, измени слово так, чтобы эта гласная стала ударной.', 'Это слово называется проверочным.'], ex: 'вода — вОды, гора — гОры, лиса — лИсы.', q: { q: 'Какое слово проверочное для ЛИСА?', o: ['лИсы', 'лисица', 'лисёнок'], a: 0 } },
+  { t: 'Парные согласные', p: ['Есть пары звонких и глухих: Б-П, В-Ф, Г-К, Д-Т, Ж-Ш, З-С.', 'На конце слова звонкая звучит глухо: пишем ДУБ, а слышим «дуп».', 'Проверка: измени слово так, чтобы после согласной стояла гласная.'], ex: 'дуб — дубы, гриб — грибы, снег — снега.', q: { q: 'Как пишется: гри… ?', o: ['грип', 'гриб'], a: 1 } },
+  { t: 'Слова-предметы, признаки, действия', p: ['Слова-предметы отвечают на вопрос КТО? или ЧТО? — кошка, мяч.', 'Слова-признаки отвечают на вопрос КАКОЙ? — весёлый, синий.', 'Слова-действия отвечают на вопрос ЧТО ДЕЛАТЬ? или ЧТО ДЕЛАЕТ? — бежит, прыгать.', 'Всегда задавай вопрос к слову, не угадывай!'], ex: 'Что? — полёт (предмет). Какой? — быстрый. Что делает? — летит.', q: { q: 'На какой вопрос отвечает слово ВЕСЁЛЫЙ?', o: ['Что?', 'Какой?', 'Что делает?'], a: 1 } },
+  { t: 'Родственные слова', p: ['Родственные слова — как одна семья: они похожи и по звучанию, и по смыслу.', 'Общая часть родственных слов называется корень.', 'Бывают слова-обманщики: похожи, но по смыслу не родственники.'], ex: 'лес, лесок, лесник — одна семья. А ЛЕСТНИЦА — не родственник леса.', q: { q: 'Какое слово лишнее?', o: ['вода', 'водичка', 'водитель'], a: 2 } },
+  { t: 'Разделительный Ь', p: ['Разделительный мягкий знак стоит после согласной перед буквами Е, Ё, Ю, Я, И.', 'Он как стеночка: разделяет звуки, и мы произносим их отдельно.'], ex: 'вьюга, листья, семья, соловьи.', q: { q: 'Как правильно?', o: ['соловеи', 'соловьи'], a: 1 } }
+ ],
+ ma: [
+  { t: 'Состав числа', p: ['Любое число можно разложить на две части, как домик на два окошка.', 'Если знаешь состав числа, легко складывать и вычитать.'], ex: '7 — это 5 и 2, 4 и 3, 6 и 1.', q: { q: '8 — это 5 и …', o: ['2', '3', '4'], a: 1 } },
+  { t: 'Сложение и вычитание', p: ['Когда складываем: слагаемое + слагаемое = сумма.', 'Когда вычитаем: уменьшаемое − вычитаемое = разность.', 'От перестановки слагаемых сумма не меняется.'], ex: '3 + 5 = 5 + 3 = 8.', q: { q: 'Как называется ответ при сложении?', o: ['Разность', 'Сумма', 'Слагаемое'], a: 1 } },
+  { t: 'Десятки и единицы', p: ['10 единиц — это 1 десяток.', 'В двузначном числе первая цифра — десятки, вторая — единицы.'], ex: 'В числе 34 — 3 десятка и 4 единицы.', q: { q: 'Сколько десятков в числе 57?', o: ['7', '5', '57'], a: 1 } },
+  { t: 'Переход через десяток', p: ['Если сумма больше 10, удобно сначала дополнить число до 10, а потом прибавить остаток.'], ex: '8 + 5: к 8 прибавим 2 — будет 10, и ещё 3 — будет 13.', q: { q: '9 + 4 = ?', o: ['12', '13', '14'], a: 1 } },
+  { t: 'Больше, меньше, равно', p: ['Знаки > и < похожи на клювик голодного птенчика.', 'Клювик всегда открыт к большему числу — он хочет съесть побольше!', 'Если числа одинаковые, ставим знак =.'], ex: '7 > 3, 2 < 9, 5 = 5.', q: { q: '45 … 54', o: ['>', '<', '='], a: 1 } },
+  { t: 'Задача', p: ['В задаче есть условие (что известно) и вопрос (что нужно узнать).', 'Потом пишем решение и ответ.', 'Подсказки: «стало больше, добавили, прилетели» — складываем. «Отдали, съели, улетели» — вычитаем.'], ex: 'На ветке 6 воробьёв, 2 улетели. 6 − 2 = 4. Ответ: 4 воробья.', q: { q: 'В вазе 5 яблок, положили ещё 3. Сколько стало?', o: ['2', '8', '15'], a: 1 } },
+  { t: 'Умножение', p: ['Умножение — это быстрое сложение одинаковых чисел.', 'Вместо 3 + 3 + 3 + 3 пишем 3 × 4.'], ex: '3 × 4 = 3 + 3 + 3 + 3 = 12.', q: { q: '2 × 5 = ?', o: ['7', '10', '25'], a: 1 } },
+  { t: 'Деление', p: ['Деление — это когда раздаём поровну.', 'Делимое : делитель = частное.'], ex: '12 конфет на 3 друзей: 12 : 3 = 4 конфеты каждому.', q: { q: '10 : 2 = ?', o: ['5', '8', '20'], a: 0 } },
+  { t: 'Порядок действий', p: ['Сначала решаем то, что в скобках.', 'Потом умножение и деление.', 'Потом сложение и вычитание — по порядку, слева направо.'], ex: '10 − (3 + 2) = 10 − 5 = 5.', q: { q: '8 − 2 + 3 = ?', o: ['3', '9', '13'], a: 1 } },
+  { t: 'Длина: см, дм, м', p: ['Сантиметр — маленький, примерно ширина твоего ноготка.', '1 дециметр = 10 сантиметров.', '1 метр = 10 дециметров = 100 сантиметров.'], ex: 'Тетрадь длиной примерно 2 дм, то есть 20 см.', q: { q: '1 дм = … см', o: ['100', '10', '1'], a: 1 } },
+  { t: 'Время', p: ['В одном часе 60 минут, в сутках 24 часа.', 'Маленькая стрелка на часах показывает часы, большая — минуты.'], ex: 'Урок длится 40 минут — это меньше часа.', q: { q: 'Сколько минут в одном часе?', o: ['24', '60', '100'], a: 1 } },
+  { t: 'Фигуры и периметр', p: ['У прямоугольника 4 прямых угла. Квадрат — это прямоугольник, у которого все стороны равны.', 'Периметр — это длина дорожки вокруг фигуры. Чтобы найти его, складываем длины всех сторон.'], ex: 'Квадрат со стороной 3 см: 3 + 3 + 3 + 3 = 12 см.', q: { q: 'Периметр квадрата со стороной 2 см?', o: ['4 см', '8 см', '6 см'], a: 1 } },
+  { t: 'Чётные и нечётные', p: ['Чётные числа можно разделить на пары без остатка: 2, 4, 6, 8, 10.', 'В нечётных одному не хватает пары: 1, 3, 5, 7, 9.', 'Смотри на последнюю цифру числа.'], ex: '24 — чётное (на конце 4), 37 — нечётное (на конце 7).', q: { q: 'Число 37 какое?', o: ['Чётное', 'Нечётное'], a: 1 } }
+ ]
+};
+
+/* ---------- navigation ---------- */
+const S = $('#screen');
+let backFn = null;
+function frame(title, back) {
+  $('#ttl').textContent = title; backFn = back || null; $('#back').hidden = !back;
+  S.innerHTML = ''; window.scrollTo(0, 0); stopSay();
+}
+$('#back').onclick = () => backFn && backFn();
+const dayStars = d => DAYS[d].tasks.reduce((s, _, t) => s + (PROG[d + '-' + t] || 0), 0);
+
+function home() {
+  frame('Совушкина школа');
+  const top = el('div', 'owlrow', owl() + `<div class="bubble">Привет! Я Совушка. Послушай интересный факт — или выбирай сказку, задания и энциклопедию!</div>`);
+  const greet = 'Привет! Я Совушка. Нажми на карточку, и я расскажу тебе интересный факт. А ещё у нас есть сказки, задания и энциклопедия!';
+  $('.owl', top).onclick = () => say(greet);
+  S.append(top, factCard());
+  const big = el('div', 'big');
+  const b3 = el('button', 'bigbtn b-tale', `<div class="ic">🏰</div><div><h2>Сказки Королевства Знаний</h2><p>Часть 1 — 1 класс, часть 2 — 2 класс. Русский и математика</p></div>`);
+  const b4 = el('button', 'bigbtn b-enc', `<div class="ic">📚</div><div><h2>Энциклопедия Совушки</h2><p>${ENC.length} удивительных фактов: космос, животные, динозавры и многое другое</p></div>`);
+  const b1 = el('button', 'bigbtn b-play', `<div class="ic">★</div><div><h2>Задания на неделю</h2><p>7 дней приключений: внимание и смекалка</p></div>`);
+  const b2 = el('button', 'bigbtn b-ref', `<div class="ic">✎</div><div><h2>Справочник правил</h2><p>Все правила 1–2 класса коротко и просто</p></div>`);
+  const b5 = el('button', 'bigbtn b-set', `<div class="ic">🎙️</div><div><h2>Голос Совушки</h2><p>Выбрать живой голос и скорость</p></div>`);
+  b1.onclick = map; b2.onclick = () => learn('ru'); b3.onclick = books; b4.onclick = encHome; b5.onclick = voiceSettings;
+  big.append(b3, b4, b1, b2, b5); S.append(big);
+  if (INSTALL) { const ib = el('button', 'go big instbtn', '📲 Установить приложение на телефон'); ib.onclick = doInstall; S.append(ib); }
+}
+
+/* ---------- encyclopedia ---------- */
+let ENCREAD = {}, ENCSEEN = [];
+try { ENCREAD = JSON.parse(localStorage.getItem('sova-encread') || '{}'); ENCSEEN = JSON.parse(localStorage.getItem('sova-encseen') || '[]'); } catch (e) {}
+const saveEnc = () => { try { localStorage.setItem('sova-encread', JSON.stringify(ENCREAD)); localStorage.setItem('sova-encseen', JSON.stringify(ENCSEEN)); } catch (e) {} };
+const secOf = id => ENC_SECTIONS.find(x => x.id === id);
+/* Новый факт при каждом входе: берём тот, который ещё не показывали; когда все показаны — начинаем круг заново. */
+function pickNewFact() {
+  let pool = ENC.map((_, i) => i).filter(i => ENCSEEN.indexOf(i) < 0);
+  if (!pool.length) { ENCSEEN = []; pool = ENC.map((_, i) => i); }
+  const i = pool[Math.floor(Math.random() * pool.length)];
+  ENCSEEN.push(i); saveEnc(); return i;
+}
+let TODAY = pickNewFact();
+
+function factCard() {
+  const f = ENC[TODAY], sec = secOf(f.s);
+  const c = el('div', 'fact');
+  c.innerHTML = `<div class="fk">🦉 Совушка знает интересный факт · ${sec.t}</div>
+    <div class="fh"><div class="fe">${f.e}</div><div><h3>${f.t}</h3><p class="fa">${f.a}</p></div></div>`;
+  const row = el('div', 'frow');
+  const bs = el('button', 'fbtn main', '🔊 Расскажи');
+  const bm = el('button', 'fbtn', '📖 Подробно');
+  const bn = el('button', 'fbtn', '🎲 Другой факт');
+  const p = $('.fa', c);
+  const tell = () => {
+    if (bs.classList.contains('speaking')) { stopSay(); bs.classList.remove('speaking'); bs.textContent = '🔊 Расскажи'; return; }
+    bs.classList.add('speaking'); bs.textContent = '⏹ Стоп';
+    say(f.t + '. ' + f.a, null, () => { bs.classList.remove('speaking'); bs.textContent = '🔊 Расскажи'; });
+  };
+  bs.onclick = e => { e.stopPropagation(); tell(); };
+  p.onclick = $('.fe', c).onclick = $('h3', c).onclick = tell;
+  bm.onclick = () => factPage(TODAY, home, true);
+  bn.onclick = () => { stopSay(); TODAY = pickNewFact(); c.replaceWith(factCard()); };
+  row.append(bs, bm, bn); c.append(row);
+  return c;
+}
+
+function encHome() {
+  frame('Энциклопедия', home);
+  const read = Object.keys(ENCREAD).length;
+  S.append(el('div', 'owlrow', owl('small') + `<div class="bubble">${read ? 'Прочитано уже ' + read + ' из ' + ENC.length + '! Выбирай раздел.' : 'Выбирай раздел — и я расскажу самое интересное!'}</div>`));
+  const bar = el('div', 'encbar');
+  const q = el('input'); q.type = 'search'; q.placeholder = '🔎 Найти: кит, Луна, сердце…';
+  const rnd = el('button', 'go', '🎲 Случайный факт');
+  rnd.onclick = () => factPage(Math.floor(Math.random() * ENC.length), encHome, false);
+  bar.append(q, rnd); S.append(bar);
+  const box = el('div');
+  const grid = () => {
+    box.innerHTML = '';
+    const g = el('div', 'secs');
+    ENC_SECTIONS.forEach(sec => {
+      const all = ENC.filter(f => f.s === sec.id), r = all.filter(f => ENCREAD[ENC.indexOf(f)]).length;
+      const b = el('button', 'sec', `<span class="se">${sec.e}</span><b>${sec.t}</b><small>${r ? '✔ ' + r + ' из ' + all.length : all.length + ' фактов'}</small>`);
+      b.style.background = sec.c; b.onclick = () => encSection(sec.id);
+      g.append(b);
+    });
+    box.append(g);
+  };
+  q.oninput = () => {
+    const t = q.value.trim().toLowerCase().replace(/ё/g, 'е');
+    if (t.length < 2) { grid(); return; }
+    box.innerHTML = '';
+    const re = new RegExp('(^|[^а-яa-z])' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const hits = ENC.map((f, i) => i).filter(i => re.test((ENC[i].t + ' ' + ENC[i].a + ' ' + ENC[i].m).toLowerCase().replace(/ё/g, 'е')));
+    box.append(hits.length ? factList(hits, encHome) : el('div', 'note', 'Ничего не нашлось. Попробуй другое слово.'));
+  };
+  grid(); S.append(box);
+}
+
+function factList(ids, back) {
+  const l = el('div', 'flist');
+  ids.forEach(i => {
+    const f = ENC[i];
+    const b = el('button', 'fi', `<span class="fe">${f.e}</span><b>${f.t}</b>${ENCREAD[i] ? '<span class="ck">✔</span>' : ''}`);
+    b.onclick = () => factPage(i, back, false);
+    l.append(b);
+  });
+  return l;
+}
+
+function encSection(id) {
+  const sec = secOf(id);
+  frame(sec.e + ' ' + sec.t, encHome);
+  const ids = ENC.map((f, i) => i).filter(i => ENC[i].s === id);
+  S.append(factList(ids, () => encSection(id)));
+}
+
+/* Страница факта: «коротко» + «подробно», чтение вслух с подсветкой предложения. */
+function factPage(i, back, autoMore) {
+  const f = ENC[i], sec = secOf(f.s);
+  frame(sec.t, back);
+  ENCREAD[i] = 1; saveEnc();
+  const c = el('div', 'fpage');
+  c.innerHTML = `<div class="big-e">${f.e}</div><h2>${f.t}</h2><span class="chipsec" style="background:${sec.c}">${sec.e} ${sec.t}</span>`;
+  const sp = splitSent(f.a), mp = splitSent(f.m);
+  const short = el('div', 'short', sp.map(x => `<span>${x}</span>`).join(' '));
+  const more = el('div', 'more', mp.map(x => `<span>${x}</span>`).join(' '));
+  more.hidden = true;
+  const row = el('div', 'frow2');
+  const bs = el('button', 'fbtn main', '🔊 Расскажи');
+  const bm = el('button', 'fbtn', '📖 Подробно');
+  const reset = () => { bs.classList.remove('speaking'); bm.classList.remove('speaking'); bs.textContent = '🔊 Расскажи'; bm.textContent = '📖 Подробно'; };
+  const hl = box => k => { [...box.children].forEach((x, j) => x.classList.toggle('now', j === k)); if (k >= 0 && box.children[k]) box.children[k].scrollIntoView({ block: 'nearest', behavior: 'smooth' }); };
+  bs.onclick = () => {
+    if (bs.classList.contains('speaking')) { stopSay(); reset(); hl(short)(-1); return; }
+    reset(); bs.classList.add('speaking'); bs.textContent = '⏹ Стоп';
+    sayParts([f.t + '.'].concat(sp), k => hl(short)(k - 1), reset);
+  };
+  const tellMore = () => {
+    more.hidden = false;
+    if (bm.classList.contains('speaking')) { stopSay(); reset(); hl(more)(-1); return; }
+    reset(); bm.classList.add('speaking'); bm.textContent = '⏹ Стоп';
+    if (!sayParts(mp, hl(more), reset)) reset();
+  };
+  bm.onclick = tellMore;
+  short.onclick = bs.onclick;
+  row.append(bs, bm);
+  c.append(short, more, row);
+  const ids = ENC.map((x, j) => j).filter(j => ENC[j].s === f.s), pos = ids.indexOf(i);
+  const nav = el('div', 'fnav');
+  const pv = el('button', 'listen', '‹ Назад'), nx = el('button', 'go', 'Следующий ›');
+  pv.disabled = pos === 0; if (pos === 0) pv.style.opacity = .5;
+  pv.onclick = () => factPage(ids[pos - 1], back, false);
+  nx.onclick = () => factPage(ids[(pos + 1) % ids.length], back, false);
+  nav.append(pv, nx); c.append(nav);
+  S.append(c);
+  if (autoMore) tellMore();
+}
+
+/* ---------- voice settings ---------- */
+var onVoicesReady = null;
+function voiceSettings() {
+  frame('Голос Совушки', home);
+  const c = el('div', 'card');
+  c.innerHTML = `<h2>🎙️ Выбери голос</h2><p style="margin:0;font-weight:700">Нажми на голос, чтобы послушать. Голоса со звёздочкой ★ звучат живее всего.</p>`;
+  const list = el('div', 'vlist');
+  const draw = () => {
+    list.innerHTML = '';
+    const vs = ruVoices().sort((a, b) => voiceScore(b) - voiceScore(a)), cur = bestVoice();
+    if (!vs.length) { list.append(el('div', 'note', 'На этом устройстве пока нет русских голосов. Посмотри подсказку ниже.')); return; }
+    vs.forEach(v => {
+      const b = el('button', 'vi' + (cur && v.name === cur.name ? ' on' : ''), `<span class="star">${isLive(v) ? '★' : '☆'}</span><span>${v.name.replace(/Microsoft |Google |\(.*?\)| - .*$/g, '').trim() || v.name}<small>${isLive(v) ? 'живой голос' : 'обычный голос'}${v.localService === false ? ' · нужен интернет' : ''}</small></span>`);
+      b.onclick = () => { VS.name = v.name; saveVS(); draw(); say('Привет! Я Совушка. Тебе нравится мой голос?'); };
+      list.append(b);
+    });
+  };
+  onVoicesReady = draw; draw();
+  const sp = el('div'); sp.style.marginTop = '16px';
+  sp.innerHTML = `<b>Скорость: <span id="rv"></span></b><input class="range" type="range" min="0.7" max="1.2" step="0.05">`;
+  const r = $('input', sp), rv = $('#rv', sp);
+  const lab = () => rv.textContent = VS.rate < 0.85 ? 'медленно' : VS.rate > 1.05 ? 'быстро' : 'обычно';
+  r.value = VS.rate; lab();
+  r.oninput = () => { VS.rate = +r.value; lab(); saveVS(); };
+  r.onchange = () => say('Вот так я буду читать.');
+  const note = el('div', 'note', `<b>Как сделать голос живее на телефоне Android:</b> открой Настройки → Специальные возможности → Синтез речи (или «Преобразование текста в речь»). Выбери «Синтезатор речи Google», нажми ⚙️ → «Установить голосовые данные» → Русский и выбери самый приятный голос. Потом вернись сюда.<br><br><b>На компьютере</b> самые живые голоса — в браузере Microsoft Edge (Светлана, Дария, Дмитрий).`);
+  c.append(list, sp, note); S.append(c);
+}
+
+/* ---------- install as app ---------- */
+let INSTALL = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); INSTALL = e; if ($('#ttl').textContent === 'Совушкина школа') home(); });
+function doInstall() { if (!INSTALL) return; INSTALL.prompt(); INSTALL.userChoice.finally(() => { INSTALL = null; home(); }); }
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) { window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {})); }
+
+function map() {
+  frame('Задания на неделю', home);
+  const total = totalStars();
+  S.append(el('div', 'owlrow', owl('small') + `<div class="bubble">${total ? 'У тебя уже ' + total + ' ★! Выбирай день.' : 'Выбирай день! За каждое задание — до 3 звёзд.'}</div>`));
+  const m = el('div', 'map');
+  DAYS.forEach((d, i) => {
+    const st = dayStars(i), full = d.tasks.length * 3;
+    const b = el('button', 'isl' + (DAYS[i].tasks.every((_, t) => PROG[i + '-' + t]) ? ' done' : ''));
+    b.innerHTML = `<div class="num" style="background:${d.color}">${i + 1}</div><div><div class="t">${d.name}</div><div class="st">${'★'.repeat(st)}<i>${'★'.repeat(full - st)}</i></div></div>`;
+    b.onclick = () => day(i, 0);
+    m.append(b);
+  });
+  S.append(m);
+}
+
+/* ---------- task runner ---------- */
+function day(di, ti) {
+  const D = DAYS[di], T = D.tasks[ti];
+  frame('День ' + (di + 1) + ' · ' + D.name, map);
+  const tabs = el('div', 'tabs');
+  D.tasks.forEach((t, i) => {
+    const s = PROG[di + '-' + i] || 0;
+    const b = el('button', 'tab' + (i === ti ? ' on' : ''), `${i + 1}. ${t.title}<small>${'★'.repeat(s) || '☆☆☆'}</small>`);
+    b.onclick = () => day(di, i); tabs.append(b);
+  });
+  S.append(tabs);
+  const card = el('div', 'card');
+  const tagTxt = { att: 'Внимание', wit: 'Смекалка', trk: 'Хитрый вопрос' }[T.kind];
+  card.innerHTML = `<span class="tag ${T.kind}">${tagTxt}</span><h2>${T.title}</h2><div class="explain">${T.explain}</div>`;
+  const body = el('div'); const msg = el('div', 'msg');
+  card.append(body, msg);
+  const readTask = () => T.title + '. ' + T.explain + ' ' + [...body.querySelectorAll('.do')].map(e => e.textContent).join(' ');
+  $('h2', card).append(sayBtn(readTask));
+  const ctx = { level: 0, done: false,
+    ok(t) { msg.className = 'msg ok'; msg.textContent = t || pick(PRAISE); ding(true); speak(msg.textContent); },
+    bad(t, e) { msg.className = 'msg bad'; msg.textContent = t || pick(TRY); ding(false); speak(msg.textContent); if (e) shakeIt(e); },
+    finish() { if (ctx.done) return; ctx.done = true; const stars = 3 - ctx.level; const key = di + '-' + ti;
+      PROG[key] = Math.max(PROG[key] || 0, stars); save(); updTotal(); setTimeout(() => party(stars, di, ti), 500); } };
+  RENDER[T.type](T, body, ctx);
+  // hints
+  const hints = el('div', 'hints');
+  const h1 = el('button', 'hbtn', '💡 Подсказка'), h2 = el('button', 'hbtn help', '🦉 Помощь Совушки');
+  const box = el('div');
+  h1.onclick = () => { ctx.level = Math.max(ctx.level, 1); h1.disabled = true; box.innerHTML = `<div class="hintbox">💡 ${T.hint}</div>`; speak('Подсказка. ' + T.hint); };
+  h2.onclick = () => { ctx.level = 2; h1.disabled = true; h2.disabled = true; const hp = typeof T.help === 'function' ? T.help() : T.help;
+    box.innerHTML = `<div class="hintbox">💡 ${T.hint}</div><div class="hintbox help">🦉 ${hp}</div>`; speak('Совушка помогает. ' + hp); if (ctx.onHelp) ctx.onHelp(); };
+  hints.append(h1, h2);
+  card.append(hints, box,
+    el('p', 'prog', 'Без подсказок — 3 ★, с подсказкой — 2 ★, с помощью Совушки — 1 ★.'));
+  S.append(card);
+  speak(readTask());
+}
+
+function party(stars, di, ti) {
+  $('#powl').innerHTML = owl() .replace('class="owl ', 'style="margin:0 auto" class="owl ');
+  $('#ptitle').textContent = stars === 3 ? 'Великолепно!' : stars === 2 ? 'Молодец!' : 'Получилось!';
+  $('#pstars').innerHTML = [0, 1, 2].map(i => i < stars ? '<span>★</span>' : '<span><i>★</i></span>').join('');
+  const last = ti === DAYS[di].tasks.length - 1;
+  $('#ptext').textContent = last ? 'День ' + (di + 1) + ' пройден! Ты собрала ' + dayStars(di) + ' ★.' : 'Переходим к следующему заданию.';
+  $('#pnext').textContent = last ? 'К карте недели' : 'Дальше';
+  $('#party').hidden = false;
+  speak($('#ptitle').textContent + ' ' + $('#ptext').textContent);
+  $('#pnext').onclick = () => { $('#party').hidden = true; last ? map() : day(di, ti + 1); };
+}
+
+/* ---------- task types ---------- */
+const RENDER = {
+  hunt(T, body, ctx) {
+    let r = 0; const found = new Set();
+    const need = ch => [...T.letters].filter(c => c === ch).length;
+    T.help = () => 'Букв ' + T.rounds.map(c => c + ' здесь ' + need(c)).join(', а букв ') + '. Я подсветила те, что ты ещё не нашла.';
+    const doTxt = el('p', 'do'); const letters = el('div', 'letters'); const cnt = el('div', 'counter');
+    const tiles = [...T.letters].map((c, i) => { const b = el('button', 'lt', c); b.onclick = () => tap(i, b); letters.append(b); return b; });
+    function upd() { doTxt.innerHTML = r === 0 ? `Нажми на все буквы <b style="color:var(--coral)">${T.rounds[0]}</b> — зачеркни их!` : `Теперь найди все буквы <b style="color:var(--grape)">${T.rounds[1]}</b> — обведи их!`;
+      cnt.textContent = 'Нашла: ' + [...found].filter(i => T.letters[i] === T.rounds[r]).length; }
+    function tap(i, b) {
+      if (ctx.done || found.has(i)) return;
+      if (T.letters[i] === T.rounds[r]) { found.add(i); b.classList.add('g' + r); ding(true);
+        const got = [...found].filter(k => T.letters[k] === T.rounds[r]).length;
+        if (got === need(T.rounds[r])) { if (r === 0) { r = 1; ctx.ok('Все буквы ' + T.rounds[0] + ' найдены! Теперь следующая.'); } else { ctx.ok(); ctx.finish(); } }
+        upd();
+      } else ctx.bad('Это буква ' + T.letters[i] + '. Посмотри внимательнее!', b);
+    }
+    ctx.onHelp = () => tiles.forEach((b, i) => { if (!found.has(i) && T.letters[i] === T.rounds[r]) { b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash'); } });
+    upd(); body.append(doTxt, letters, cnt);
+  },
+  chain(T, body, ctx) {
+    body.append(el('p', 'do', 'Заполни пустые клеточки. Меняй по одной букве!'));
+    const left = new Set(T.chains.map((_, i) => i));
+    T.chains.forEach((c, ci) => {
+      const row = el('div', 'chain');
+      row.append(el('span', 'word', c.from));
+      const ins = [];
+      for (let s = 0; s < c.steps; s++) { row.append(el('span', 'arr', '→')); const i = el('input', 'w'); i.id = 'ch' + ci + s; i.autocomplete = 'off'; i.setAttribute('autocapitalize', 'off'); ins.push(i); row.append(i); }
+      row.append(el('span', 'arr', '→'), el('span', 'word', c.to));
+      const go = el('button', 'go', 'Проверить');
+      go.onclick = () => {
+        let prev = c.from; ins.forEach(i => i.classList.remove('okk', 'badd'));
+        for (const i of ins) {
+          const w = norm(i.value);
+          if (!w) { ctx.bad('Заполни все клеточки.', i); return; }
+          if (!oneDiff(prev, w)) { i.classList.add('badd'); ctx.bad('Здесь поменялась не одна буква. Сравни со словом «' + prev.toLowerCase() + '».', i); return; }
+          if (!DICT.has(w)) { i.classList.add('badd'); ctx.bad('Такого слова я не знаю. Придумай другое.', i); return; }
+          i.classList.add('okk'); prev = w;
+        }
+        if (!oneDiff(prev, c.to)) { ctx.bad('Из последнего слова должно получаться «' + c.to.toLowerCase() + '» — тоже одной буквой.', ins[ins.length - 1]); return; }
+        go.disabled = true; ins.forEach(i => i.disabled = true); left.delete(ci);
+        if (left.size) ctx.ok('Цепочка готова! Осталась ещё одна.'); else { ctx.ok(); ctx.finish(); }
+      };
+      ins.forEach(i => i.addEventListener('keydown', e => { if (e.key === 'Enter') go.click(); }));
+      const wrap = el('div', 'group'); wrap.append(row, go); body.append(wrap);
+    });
+  },
+  collect(T, body, ctx) {
+    if (T.prompt) body.append(el('p', 'do', T.prompt));
+    else body.append(el('p', 'do', 'Найди слова и напиши их по одному.'));
+    let left = T.groups.length;
+    T.groups.forEach((g, gi) => {
+      const box = el('div', 'group'); const got = new Set(); const acc = new Set(g.accept.map(norm));
+      const prog = el('span', 'prog');
+      const updP = () => prog.textContent = 'Нашла ' + got.size + ' из ' + g.need;
+      const row = el('div', 'row'); const i = el('input', 'w'); i.id = 'cl' + gi; i.autocomplete = 'off'; i.setAttribute('autocapitalize', 'off');
+      const go = el('button', 'go', 'Проверить'); const chips = el('div', 'chips');
+      row.append(i, go, prog);
+      const check = () => {
+        const w = norm(i.value); if (!w || got.size >= g.need) return;
+        if (got.has(w)) { ctx.bad('Это слово уже есть! Найди другое.', i); return; }
+        if (acc.has(w)) { got.add(w); chips.append(el('span', 'chip', i.value.trim().toLowerCase())); i.value = ''; updP();
+          if (got.size >= g.need) { i.disabled = true; go.disabled = true; left--; if (left) ctx.ok('Здорово! Переходи к следующему.'); else { ctx.ok(); ctx.finish(); } } else ctx.ok();
+        } else ctx.bad('Такого слова тут нет. Попробуй ещё!', i);
+      };
+      go.onclick = check; i.addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+      box.append(el('div', 'glab', g.label), row, chips); updP(); body.append(box);
+    });
+  },
+  same(T, body, ctx) {
+    body.append(el('p', 'do', 'Одинаковые слова или нет? Нажми на ответ.'));
+    let left = T.pairs.length; const wrap = el('div');
+    T.pairs.forEach(([a, b]) => {
+      const same = a === b; const row = el('div', 'pair');
+      const w = el('div', 'pw', `${a} — ${b}`);
+      const y = el('button', 'opt', 'Одинаковые'), n = el('button', 'opt', 'Разные');
+      const ans = (isSame, btn) => {
+        if (row.dataset.done) return;
+        if (isSame === same) { row.dataset.done = 1; btn.classList.add('right'); y.disabled = n.disabled = true;
+          if (!same) w.innerHTML = a + ' — ' + [...b].map((c, i) => c !== a[i] ? '<b>' + c + '</b>' : c).join('');
+          if (--left === 0) { ctx.ok(); ctx.finish(); } else ctx.ok(same ? 'Верно, одинаковые!' : 'Верно! Видишь неправильную букву?');
+        } else ctx.bad(null, btn);
+      };
+      y.onclick = () => ans(true, y); n.onclick = () => ans(false, n);
+      row.append(w, y, n); wrap.append(row);
+    });
+    body.append(wrap);
+  },
+  quiz(T, body, ctx) {
+    let left = T.qs.length;
+    T.qs.forEach(q => {
+      const box = el('div', 'q'); box.append(el('p', null, q.q)); const opts = el('div', 'opts');
+      q.o.forEach((o, i) => { const b = el('button', 'opt', o); b.onclick = () => {
+        if (box.dataset.done) return;
+        if (i === q.a) { box.dataset.done = 1; b.classList.add('right'); if (--left === 0) { ctx.ok(); ctx.finish(); } else ctx.ok(); }
+        else { b.classList.add('wrong'); ctx.bad(null, b); } }; opts.append(b); });
+      box.append(opts); body.append(box);
+    });
+  },
+  changed(T, body, ctx) {
+    let r = 0;
+    const area = el('div'); body.append(area);
+    function step1() {
+      const R = T.rounds[r]; area.innerHTML = '';
+      area.append(el('p', 'do', `Раунд ${r + 1} из ${T.rounds.length}. Запомни слова:`));
+      const m = el('div', 'memo'); R.a.forEach(w => m.append(el('span', null, w)));
+      const go = el('button', 'go', 'Запомнила!'); go.onclick = step2;
+      area.append(m, go); if (r > 0) speak('Раунд ' + (r + 1) + '. Запомни слова.');
+    }
+    function step2() {
+      const R = T.rounds[r]; area.innerHTML = '';
+      area.append(el('p', 'do', 'А теперь посмотри. Что изменилось?'));
+      const m = el('div', 'memo'); R.b.forEach(w => m.append(el('span', null, w)));
+      const opts = el('div', 'opts');
+      R.o.forEach((o, i) => { const b = el('button', 'opt', o); b.onclick = () => {
+        if (i === R.r) { b.classList.add('right'); r++;
+          if (r === T.rounds.length) { ctx.ok(); ctx.finish(); } else { ctx.ok('Верно! Следующий раунд.'); setTimeout(step1, 900); }
+        } else { b.classList.add('wrong'); ctx.bad('Нет. Можешь посмотреть слова ещё раз — нажми «Показать снова».', b); } };
+        opts.append(b); });
+      const again = el('button', 'listen', 'Показать снова'); again.onclick = step1; again.style.marginTop = '10px';
+      area.append(m, opts, again);
+    }
+    step1();
+  },
+  errors(T, body, ctx) {
+    body.append(el('p', 'do', 'Нажми на слова, в которых есть ошибка. Их 4.'));
+    const fix = {}; for (const k in T.fix) fix[norm(k)] = T.fix[k];
+    let left = Object.keys(fix).length; const t = el('div', 'etext'); const cnt = el('div', 'counter', 'Нашла: 0 из ' + left);
+    const total = left;
+    T.text.split(' ').forEach(tok => {
+      const b = el('button', 'tok', tok);
+      b.onclick = () => {
+        if (b.dataset.done || ctx.done) return;
+        const k = norm(tok);
+        if (fix[k]) { b.dataset.done = 1; b.classList.add('fixed'); const p = tok.replace(/[а-яё]+/i, ''); b.innerHTML = '<s>' + tok.replace(/[.,!?]/g, '') + '</s>' + fix[k] + p;
+          left--; cnt.textContent = 'Нашла: ' + (total - left) + ' из ' + total; if (left) ctx.ok('Нашла! Правильно: ' + fix[k] + '.'); else { ctx.ok(); ctx.finish(); } }
+        else ctx.bad('Это слово написано правильно.', b);
+      };
+      t.append(b);
+    });
+    body.append(t, cnt);
+  }
+};
+
+/* ---------- Обучалка ---------- */
+function learn(sub) {
+  frame('Справочник правил', home);
+  const sw = el('div', 'subj');
+  const r = el('button', sub === 'ru' ? 'on' : '', 'Русский язык'), m = el('button', sub === 'ma' ? 'on m' : 'm', 'Математика');
+  r.onclick = () => learn('ru'); m.onclick = () => learn('ma');
+  sw.append(r, m); S.append(sw);
+  const lr = el('div', 'owlrow', owl('small') + `<div class="bubble">Выбери тему. Я расскажу простыми словами, а потом проверим, как ты поняла!</div>`);
+  $('.owl', lr).onclick = () => say('Выбери тему. Я расскажу простыми словами, а потом проверим, как ты поняла!'); S.append(lr);
+  const g = el('div', 'topics');
+  LEARN[sub].forEach((tp, i) => {
+    const b = el('button', 'tp ' + sub, `<span class="n">${i + 1}</span><span>${tp.t}</span>${LEARNED[sub + i] ? '<span class="ck">✔</span>' : ''}`);
+    b.onclick = () => topic(sub, i); g.append(b);
+  });
+  S.append(g);
+}
+function topic(sub, i) {
+  const tp = LEARN[sub][i];
+  frame(tp.t, () => learn(sub));
+  const card = el('div', 'card lesson');
+  card.innerHTML = `<span class="tag ${sub === 'ru' ? 'wit' : 'att'}" style="background:${sub === 'ru' ? 'var(--mint)' : 'var(--grape)'}">${sub === 'ru' ? 'Русский язык' : 'Математика'}</span><h2>${tp.t}</h2>`;
+  tp.p.forEach(p => card.append(el('p', null, p)));
+  card.append(el('div', 'example', '<b>Пример</b>' + tp.ex));
+  const ls = el('button', 'listen', '🔊 Послушать');
+  const lesson = tp.t + '. ' + tp.p.join(' ') + ' Пример: ' + tp.ex + ' А теперь проверь себя: ' + tp.q.q;
+  ls.onclick = () => { if (!say(lesson)) ls.textContent = 'Звук не поддерживается'; };
+  speak(lesson);
+  card.append(ls);
+  const q = el('div', 'q'); q.style.marginTop = '14px';
+  q.append(el('p', null, 'Проверь себя: ' + tp.q.q)); const opts = el('div', 'opts'); const msg = el('div', 'msg');
+  tp.q.o.forEach((o, k) => { const b = el('button', 'opt', o); b.onclick = () => {
+    if (q.dataset.done) return;
+    if (k === tp.q.a) { q.dataset.done = 1; b.classList.add('right'); msg.className = 'msg ok'; msg.textContent = pick(PRAISE) + ' Тема понятна!'; ding(true); speak(msg.textContent); LEARNED[sub + i] = 1; save(); }
+    else { b.classList.add('wrong'); msg.className = 'msg bad'; msg.textContent = 'Перечитай правило ещё раз — ответ там есть.'; ding(false); speak('Послушай правило ещё раз, ответ там есть.'); shakeIt(b); } }; opts.append(b); });
+  q.append(opts, msg); card.append(q);
+  const nav = el('div', 'hints');
+  if (i > 0) { const p = el('button', 'hbtn', '‹ Прошлая тема'); p.onclick = () => topic(sub, i - 1); nav.append(p); }
+  if (i < LEARN[sub].length - 1) { const n = el('button', 'hbtn help', 'Следующая тема ›'); n.onclick = () => topic(sub, i + 1); nav.append(n); }
+  card.append(nav);
+  S.append(card);
+}
+
+/* ================== СКАЗКА «КОРОЛЕВСТВО ЗНАНИЙ» (1 класс) ================== */
+var TALEP = {}, HERO = '';
+try { TALEP = JSON.parse(localStorage.getItem('sova-tale') || '{}'); HERO = localStorage.getItem('sova-name') || ''; } catch (e) {}
+function saveTale() { try { localStorage.setItem('sova-tale', JSON.stringify(TALEP)); localStorage.setItem('sova-name', HERO); } catch (e) {} }
+function taleStars() { var s = 0; for (var k in TALEP) s += TALEP[k]; return s; }
+
+var BOOK1 = [
+ { land: 'Деревня Эхо', color: '#FF8A3D', icon: '🏡', subj: 'ru',
+   scenes: [
+    ['n', 'Далеко-далеко есть Королевство Знаний. Там живут буквы, звуки и числа. Жили они дружно и весело.'],
+    ['k', 'Ха-ха-ха! Я — колдун Кляксус! Я заляпаю всё королевство кляксами! Пусть никто не умеет ни читать, ни считать!'],
+    ['n', 'Кляксус взмахнул чёрным плащом — и по королевству растеклись чернильные кляксы.'],
+    ['o', 'Беда! Королевству нужна смелая помощница. Это ты! Я Совушка. Я буду рядом и всё-всё объясню.'],
+    ['o', 'Первая остановка — Деревня Эхо. Кляксус украл у жителей голоса, а птичку Говорушку запер в клетку. Но сначала — маленький урок!']],
+   lesson: { t: 'Звуки и буквы', p: ['Звуки мы слышим и произносим. Буквы мы видим и пишем.', 'Буква — это домик для звука. Звук живёт в нём и откликается, когда мы читаем.', 'В русском алфавите 33 буквы.'], ex: 'Слово КОТ: три буквы — К, О, Т — и три звука.' },
+   quest: { intro: 'Клетку держат 4 замка. Каждый правильный ответ открывает один замок!',
+    goal: { type: 'locks', n: 4, npc: '🐦', ok: 'Щёлк! Замок открыт!' },
+    qs: [{ q: 'Что мы слышим и произносим?', o: ['Звуки', 'Буквы'], a: 0, h: 'Звук — как песенка: его слышат ушками.' },
+         { q: 'Что мы видим и пишем?', o: ['Звуки', 'Буквы'], a: 1, h: 'То, что нарисовано в книжке, — это значки.' },
+         { q: 'Сколько букв в слове КОТ?', o: ['2', '3', '4'], a: 1, h: 'Посчитай пальчиком каждую букву.' },
+         { q: 'Сколько букв в русском алфавите?', o: ['33', '10', '100'], a: 0, h: 'Это число из двух одинаковых цифр-троек.' }] },
+   win: [['e:🐦:Птичка Говорушка', 'Чик-чирик! Спасибо! Ко мне вернулся голос! И все жители снова разговаривают!'],
+         ['o', 'Молодец! Но Кляксус уже у реки. Скорее туда!']] },
+
+ { land: 'Река Считалка', color: '#2A9DF4', icon: '🌊', subj: 'ma',
+   scenes: [
+    ['n', 'Вы подошли к широкой реке Считалке. Мост через неё сломан: Кляксус утащил все досочки.'],
+    ['e:🦔:Ёжик Колючкин', 'Ой-ой! Мне нужно на тот берег, к маме. А досочек нет…'],
+    ['o', 'Мост волшебный: досочка встаёт на место, если правильно посчитать. Давай сначала узнаем секрет чисел!']],
+   lesson: { t: 'Состав числа', p: ['Числа можно разбирать на две части, как бусинки на две кучки.', '5 бусинок — это 2 и 3. Или 4 и 1. Всего всё равно 5!', 'Если знаешь, из чего состоит число, считать очень легко.'], ex: '6 — это 5 и 1, 4 и 2, 3 и 3.' },
+   quest: { intro: 'Построй мост из 5 досочек, чтобы Ёжик попал домой!',
+    goal: { type: 'fill', n: 5, cls: 'plank', ok: 'Тук-тук! Досочка на месте!' },
+    qs: [{ q: '5 — это 3 и …', o: ['1', '2', '3'], a: 1, h: 'Сколько надо добавить к 3, чтобы стало 5? Посчитай на пальчиках.' },
+         { q: '7 — это 4 и …', o: ['2', '3', '4'], a: 1, h: 'От 4 до 7 — сколько шагов?' },
+         { q: 'Какое число идёт после 8?', o: ['7', '9', '10'], a: 1, h: 'Считай: шесть, семь, восемь…' },
+         { q: 'Какое число стоит между 5 и 7?', o: ['4', '6', '8'], a: 1, h: 'Скажи вслух: пять, …, семь.' },
+         { q: '10 — это 6 и …', o: ['3', '4', '5'], a: 1, h: 'Покажи 10 пальчиков и загни 6. Сколько осталось?' }] },
+   win: [['e:🦔:Ёжик Колючкин', 'Ура! Я бегу к маме! Спасибо тебе!'], ['o', 'Мост готов. Вперёд, в Поющий лес!']] },
+
+ { land: 'Поющий лес', color: '#1FB59B', icon: '🌳', subj: 'ru',
+   scenes: [
+    ['n', 'В Поющем лесу всегда звучали песни. Но сегодня тихо и грустно.'],
+    ['k', 'Хи-хи! Мои Кляксята утащили все гласные звуки! Без гласных песню не споёшь!'],
+    ['o', 'Гласные — самые певучие звуки. Узнаем, как их отличить, и прогоним Кляксят!']],
+   lesson: { t: 'Гласные и согласные', p: ['Гласные звуки можно петь: а-а-а, о-о-о, у-у-у. Воздух выходит свободно.', 'Гласных букв десять: А, О, У, Ы, Э, Я, Ё, Ю, И, Е.', 'Согласные не поются: воздуху мешают губы, зубы или язык. Например: Б, К, М, С.'], ex: 'В слове МАК гласная — А, согласные — М и К.' },
+   quest: { intro: 'Прогони 4 Кляксят! Каждый верный ответ — и один Кляксёнок убегает.',
+    goal: { type: 'blots', n: 4, ok: 'Бах! Кляксёнок убежал!' },
+    qs: [{ type: 'pick', q: 'Нажми на все гласные буквы, потом — «Проверить».', tiles: ['М', 'А', 'К', 'О', 'С', 'У', 'Т', 'И'], ok: ['А', 'О', 'У', 'И'], h: 'Попробуй пропеть каждую букву. Какие поются?' },
+         { q: 'Какая буква согласная?', o: ['А', 'Р', 'Я'], a: 1, h: 'Пропой каждую букву. Какую не получается петь?' },
+         { q: 'Сколько гласных в слове МАМА?', o: ['1', '2', '4'], a: 1, h: 'Найди буквы, которые поются: М-А-М-А.' },
+         { q: 'Какой звук можно долго петь?', o: ['[а]', '[п]', '[к]'], a: 0, h: 'Попробуй спеть каждый звук вслух.' }] },
+   win: [['n', 'Кляксята с визгом разбежались, а лес снова запел: «А-а-а! О-о-о! У-у-у!»'], ['o', 'Ты умница! Слышишь шум? Это Лесная ярмарка. Там что-то случилось!']] },
+
+ { land: 'Лесная ярмарка', color: '#E2457F', icon: '🎪', subj: 'ma',
+   scenes: [
+    ['n', 'На Лесной ярмарке звери продают мёд, орехи и пряники. Но кто это кричит?'],
+    ['e:🐻:Мишка-торговец', 'Помогите! Кляксята перепутали все мои ценники. Никто не может ничего посчитать!'],
+    ['o', 'Чтобы прогнать Кляксят, надо уметь прибавлять и вычитать. Слушай внимательно!']],
+   lesson: { t: 'Сложение и вычитание', p: ['Плюс — это когда становится больше: добавили, пришли, прилетели.', 'Минус — когда становится меньше: отдали, ушли, съели.', 'Считай шажками: плюс — шаги вперёд, минус — шаги назад.'], ex: '4 + 2: от 4 делаем два шага вперёд — 5, 6. Ответ: 6.' },
+   quest: { intro: 'На ярмарке хозяйничают 5 Кляксят. Прогони их всех!',
+    goal: { type: 'blots', n: 5, ok: 'Бах! Кляксёнок убежал!' },
+    qs: [{ q: '3 + 4 = ?', o: ['6', '7', '8'], a: 1, h: 'Начни с 4 и сделай 3 шага вперёд.' },
+         { q: '9 − 3 = ?', o: ['5', '6', '12'], a: 1, h: 'От 9 сделай 3 шага назад.' },
+         { q: '6 + 2 = ?', o: ['8', '4', '9'], a: 0, h: 'От 6 сделай 2 шага вперёд.' },
+         { q: '10 − 4 = ?', o: ['6', '5', '14'], a: 0, h: 'Покажи 10 пальчиков и загни 4.' },
+         { q: '5 + 0 = ?', o: ['0', '5', '6'], a: 1, h: 'Если ничего не прибавить, станет больше?' }] },
+   win: [['e:🐻:Мишка-торговец', 'Вот спасибо! Возьми в подарок медовый пряник!'], ['o', 'Дальше дорога ведёт на Гору Слогов.']] },
+
+ { land: 'Гора Слогов', color: '#7A5CF0', icon: '⛰', subj: 'ru',
+   scenes: [
+    ['n', 'Перед тобой высокая гора. На вершине висит Колокол Утра. Он будит всё королевство.'],
+    ['k', 'А я разбил ступеньки на кусочки! Никто не поднимется к колоколу!'],
+    ['o', 'Слова тоже делятся на кусочки — на слоги. Научимся делить слова, и ступеньки соберутся!']],
+   lesson: { t: 'Слоги и перенос', p: ['Слог — это кусочек слова, который говорят на одном выдохе.', 'Сколько в слове гласных, столько и слогов.', 'Переносим слово по слогам. Одну букву нельзя ни оставить на строке, ни перенести.'], ex: 'МА-ЛИ-НА — три слога. А слово ЯМА не переносим.' },
+   quest: { intro: 'Собери 5 ступенек, чтобы подняться к Колоколу!',
+    goal: { type: 'fill', n: 5, cls: 'stone', ok: 'Ступенька на месте!' },
+    qs: [{ q: 'Сколько слогов в слове МА-ШИ-НА?', o: ['2', '3', '4'], a: 1, h: 'Хлопни в ладоши на каждый кусочек.' },
+         { q: 'Сколько слогов в слове КОТ?', o: ['1', '2', '3'], a: 0, h: 'Сколько гласных в слове КОТ?' },
+         { q: 'Как правильно разделить слово ЛИСА на слоги?', o: ['ЛИ-СА', 'Л-ИСА', 'ЛИС-А'], a: 0, h: 'В каждом слоге должна быть гласная.' },
+         { q: 'Какое слово нельзя перенести?', o: ['ЯМА', 'РЫБА', 'ЗИМА'], a: 0, h: 'Одну букву нельзя оставлять на строке.' },
+         { q: 'Сколько слогов в слове СОБАКА?', o: ['2', '3', '4'], a: 1, h: 'Посчитай гласные буквы в слове.' }] },
+   win: [['n', 'Ты поднялась на вершину и ударила в колокол: «Бом-м-м!» Королевство проснулось.'], ['o', 'Слышишь писк? Кто-то зовёт на помощь. Это птенчики!']] },
+
+ { land: 'Гнездо Клювиков', color: '#FFB020', icon: '🪺', subj: 'ma',
+   scenes: [
+    ['e:🐣:Птенчики-Клювики', 'Пи-пи-пи! Мы голодные! Кляксус спрятал всех червячков!'],
+    ['o', 'Птенчики-Клювики любят большие числа: их клювик всегда открыт к большему. Это знаки «больше» и «меньше»!']],
+   lesson: { t: 'Больше, меньше, равно', p: ['Знаки «больше» и «меньше» похожи на клювик голодного птенчика.', 'Клювик всегда открыт к большему числу — он хочет съесть побольше!', 'Если числа одинаковые, ставим знак «равно».'], ex: '8 > 3     2 < 6     5 = 5' },
+   quest: { intro: 'Найди 5 червячков и накорми птенчиков!',
+    goal: { type: 'fill', n: 5, icon: '🐛', ok: 'Ам! Птенчик поел!' },
+    qs: [{ q: '5 … 8', o: ['>', '<', '='], a: 1, h: 'Какое число больше: 5 или 8? Клювик открыт к нему.' },
+         { q: '9 … 4', o: ['>', '<', '='], a: 0, h: 'Клювик открыт к большему числу.' },
+         { q: '7 … 7', o: ['>', '<', '='], a: 2, h: 'Числа одинаковые?' },
+         { q: '12 … 15', o: ['>', '<', '='], a: 1, h: 'Какое число идёт раньше при счёте: 12 или 15?' },
+         { q: 'Какое число больше?', o: ['13', '18'], a: 1, h: 'Посчитай: одиннадцать, двенадцать, тринадцать…' }] },
+   win: [['e:🐣:Птенчики-Клювики', 'Пи-пи! Мы сыты! Спасибо!'], ['o', 'Птенчики подсказали: Кляксус усыпил стражей Замка. Скорее туда!']] },
+
+ { land: 'Замок Ударения', color: '#3C8DBC', icon: '🏰', subj: 'ru',
+   scenes: [
+    ['n', 'Ворота замка закрыты. Стражи спят крепким сном — их заколдовал Кляксус.'],
+    ['o', 'Разбудить стражей можно только громким голосом! Надо найти ударный слог — он самый громкий в слове.']],
+   lesson: { t: 'Ударение', p: ['В слове один слог мы говорим громче и дольше. Он называется ударным.', 'Чтобы найти его, позови слово, как будто зовёшь друга: «Ко-о-ошка!»', 'Знак ударения ставят над гласной буквой.'], ex: 'РОза — ударный слог РО. луНА — ударный слог НА.' },
+   quest: { intro: 'Звони в 5 колоколов и разбуди стражей!',
+    goal: { type: 'fill', n: 5, icon: '🔔', ok: 'Дзинь! Колокол зазвенел!' },
+    qs: [{ q: 'Какой слог ударный в слове МАМА?', o: ['первый МА', 'второй МА'], a: 0, h: 'Позови маму: «Ма-а-ама!» Какой слог тянется?' },
+         { q: 'Какой слог ударный в слове ЛИСА?', o: ['ЛИ', 'СА'], a: 1, h: 'Позови: «Ли-са-а-а!»' },
+         { q: 'Какой слог ударный в слове ВОРОНА?', o: ['ВО', 'РО', 'НА'], a: 1, h: 'Позови: «Воро-о-она!»' },
+         { q: 'Знак ударения ставят над…', o: ['гласной буквой', 'согласной буквой'], a: 0, h: 'Протянуть голосом можно только певучие звуки.' },
+         { q: 'Какой слог ударный в слове СОБАКА?', o: ['СО', 'БА', 'КА'], a: 1, h: 'Позови собачку: «Соба-а-ака!»' }] },
+   win: [['e:💂:Страж замка', 'Мы проснулись! Спасибо, отважная! Ворота открыты.'], ['o', 'За замком — тёмная пещера. Там живёт Дракон Двадцатка…']] },
+
+ { land: 'Пещера Дракона', color: '#5B6B8C', icon: '🐉', subj: 'ma',
+   scenes: [
+    ['n', 'В пещере живёт добрый Дракон Двадцатка. Он сторожит числа от 1 до 20.'],
+    ['e:🐉:Дракон Двадцатка', 'Р-р-р… Кляксус залил меня кляксами, и я забыл все числа после десяти!'],
+    ['o', 'Поможем дракону! Каждый верный ответ смоет одну кляксу с его чешуи.']],
+   lesson: { t: 'Числа до 20', p: ['10 единиц — это один десяток.', 'Числа от 11 до 20 — второй десяток. Они состоят из десятка и единиц.', 'Название подсказывает: двенадцать — это «два на десяти», то есть 10 и 2.'], ex: '14 = 10 + 4. Один десяток и четыре единицы.' },
+   quest: { intro: 'Смой с дракона 5 клякс!',
+    goal: { type: 'blots', n: 5, ok: 'Плюх! Клякса смыта!' },
+    qs: [{ q: 'Сколько единиц в числе 16?', o: ['1', '6', '16'], a: 1, h: 'Число 16 — это десяток и ещё сколько?' },
+         { q: '1 десяток и 3 единицы — это…', o: ['13', '31', '4'], a: 0, h: 'Это 10 и ещё 3.' },
+         { q: 'Какое число идёт после 19?', o: ['18', '20', '21'], a: 1, h: 'После девятнадцати начинается новый десяток.' },
+         { q: '10 + 5 = ?', o: ['15', '105', '6'], a: 0, h: 'Десяток и пять единиц.' },
+         { q: '17 − 7 = ?', o: ['7', '10', '17'], a: 1, h: 'Убери все единицы — что останется?' }] },
+   win: [['e:🐉:Дракон Двадцатка', 'Я снова помню все числа! Садись мне на спину — я довезу тебя до Болота!'], ['n', 'Ты летишь на спине дракона высоко над облаками!']] },
+
+ { land: 'Болото Путаницы', color: '#4E9F3D', icon: '🐸', subj: 'ru',
+   scenes: [
+    ['n', 'Дракон опустил тебя у тёмного болота. Тут живёт Кикимора-Путаница.'],
+    ['e:🐸:Кикимора-Путаница', 'Хи-хи! Я подружилась с Кляксусом и перепутала все буквы в словах. Попробуй-ка пройди!'],
+    ['o', 'Не бойся! Есть правила-дружки, они не дадут нам попасться.']],
+   lesson: { t: 'ЖИ-ШИ, ЧА-ЩА, ЧУ-ЩУ', p: ['ЖИ и ШИ пиши с буквой И.', 'ЧА и ЩА пиши с буквой А.', 'ЧУ и ЩУ пиши с буквой У.', 'А в сочетаниях ЧК и ЧН мягкий знак не пишется никогда.'], ex: 'лыжи, машина, чашка, роща, чудо, щука, дочка, речной.' },
+   quest: { intro: 'Кикимора выпустила 5 Кляксят-путаниц. Прогони их!',
+    goal: { type: 'blots', n: 5, ok: 'Бах! Путаница убежала!' },
+    qs: [{ q: 'Как правильно?', o: ['шына', 'шина'], a: 1, h: 'ЖИ и ШИ пиши с буквой И.' },
+         { q: 'Как правильно?', o: ['чаща', 'чяща'], a: 0, h: 'ЧА и ЩА пиши с буквой А.' },
+         { q: 'Как правильно?', o: ['щука', 'щюка'], a: 0, h: 'ЧУ и ЩУ пиши с буквой У.' },
+         { q: 'Как правильно?', o: ['ночька', 'ночка'], a: 1, h: 'В ЧК мягкий знак не пишется.' },
+         { q: 'Как правильно?', o: ['жыраф', 'жираф'], a: 1, h: 'ЖИ пиши с буквой И.' }] },
+   win: [['e:🐸:Кикимора-Путаница', 'Ой… Ты знаешь все правила! Ладно, больше не буду путать.'], ['o', 'Впереди мельница. Кажется, там тоже беда.']] },
+
+ { land: 'Мельница', color: '#C9822B', icon: '🌾', subj: 'ma',
+   scenes: [
+    ['e:🐭:Мышка-мельничиха', 'Ах, беда! Кляксус перемешал мои мешки с мукой. Без муки не испечь пирогов для праздника!'],
+    ['o', 'Мышке помогут задачки. Давай узнаем, как их решать.']],
+   lesson: { t: 'Задача', p: ['В задаче есть условие — то, что мы знаем, и вопрос — то, что надо узнать.', 'Потом пишем решение и ответ.', 'Слова-подсказки: «стало, добавили, прилетели» — складываем. «Отдали, съели, улетели» — вычитаем.'], ex: 'У ёжика 5 грибов, он нашёл ещё 2. Сколько стало? 5 + 2 = 7. Ответ: 7 грибов.' },
+   quest: { intro: 'Реши задачки и найди 4 мешка с мукой!',
+    goal: { type: 'fill', n: 4, icon: '🌾', ok: 'Мешок найден!' },
+    qs: [{ q: 'На ветке сидели 6 воробьёв. 2 улетели. Сколько воробьёв осталось?', o: ['4', '8', '3'], a: 0, h: '«Улетели» — значит, стало меньше. Вычитаем.' },
+         { q: 'У Маши 3 яблока. Мама дала ей ещё 4. Сколько яблок стало?', o: ['7', '1', '6'], a: 0, h: '«Дала ещё» — значит, стало больше. Складываем.' },
+         { q: 'В корзинке 9 грибов. Ёжик съел 5. Сколько грибов осталось?', o: ['4', '14', '5'], a: 0, h: '«Съел» — стало меньше. От 9 отними 5.' },
+         { q: 'Как называется часть задачи, где спрашивают?', o: ['Условие', 'Вопрос', 'Ответ'], a: 1, h: 'Там стоит знак «?».' }] },
+   win: [['e:🐭:Мышка-мельничиха', 'Все мешки на месте! Будут пироги для праздника!'], ['o', 'Смотри, летит голубь! У него письмо от Короля.']] },
+
+ { land: 'Письмо Короля', color: '#B5478A', icon: '📜', subj: 'ru',
+   scenes: [
+    ['n', 'Голубь принёс письмо от Короля. Но Кляксус заляпал его: где большие буквы, где точки — не понять!'],
+    ['e:👑:Король', 'Юная помощница! Без правильных предложений я не смогу созвать войско против Кляксуса.'],
+    ['o', 'Поможем Королю! Нужно знать, как пишутся предложения и когда нужна большая буква.']],
+   lesson: { t: 'Предложение и большая буква', p: ['Предложение — это законченная мысль. Оно начинается с большой буквы.', 'В конце ставим точку, вопросительный или восклицательный знак.', 'С большой буквы пишем ещё имена, клички животных, названия городов и рек.'], ex: 'Маша гуляет с собакой Жучкой у реки Волги.' },
+   quest: { intro: 'Зажги 5 фонарей на дороге к Башне Кляксуса!',
+    goal: { type: 'fill', n: 5, icon: '🏮', ok: 'Фонарь зажёгся!' },
+    qs: [{ q: 'Какое слово нужно написать с большой буквы?', o: ['маша', 'кошка', 'стол'], a: 0, h: 'Имена людей пишем с большой буквы.' },
+         { q: 'Какое слово нужно написать с большой буквы?', o: ['река', 'волга', 'город'], a: 1, h: 'Названия рек пишем с большой буквы.' },
+         { q: 'Что ставят в конце предложения-вопроса?', o: ['.', '?', '!'], a: 1, h: 'Это знак-крючочек.' },
+         { q: 'Где предложение записано правильно?', o: ['мой кот спит.', 'Мой кот спит.', 'Мой кот спит'], a: 1, h: 'В начале — большая буква, в конце — точка.' },
+         { q: 'Сколько предложений: «Пришла зима. Идёт снег.»?', o: ['1', '2', '3'], a: 1, h: 'Посчитай точки.' }] },
+   win: [['e:👑:Король', 'Спасибо! Я верю: ты победишь Кляксуса!'], ['o', 'Фонари горят. Впереди — Башня Кляксуса. Ты готова?']] },
+
+ { land: 'Башня Кляксуса', color: '#3A2E5C', icon: '🗼', subj: 'all',
+   scenes: [
+    ['n', 'Перед тобой чёрная башня до самых облаков. На самом верху сидит колдун Кляксус.'],
+    ['k', 'Как ты сюда попала?! Ну что ж, ответь на мои вопросы. Ошибёшься — королевство навсегда останется в кляксах!'],
+    ['o', 'Ты прошла весь путь и всё знаешь. Я рядом. Давай вспомним главное!']],
+   lesson: { t: 'Вспоминаем всё', p: ['Гласные поются, согласные — нет.', 'Слогов столько, сколько гласных.', 'ЖИ-ШИ пиши с И, ЧА-ЩА — с А, ЧУ-ЩУ — с У.', 'Клювик знака открыт к большему числу.', 'Плюс — становится больше, минус — меньше.'], ex: 'Ты всё это знаешь. Вперёд!' },
+   quest: { intro: 'Финальная битва! У Кляксуса 6 сердечек. Каждый верный ответ отнимает одно!',
+    goal: { type: 'boss', n: 6, ok: 'Попала! Кляксус слабеет!' },
+    qs: [{ q: 'Какая буква гласная?', o: ['Б', 'О', 'Т'], a: 1, h: 'Какую букву можно пропеть?' },
+         { q: '8 − 3 = ?', o: ['5', '4', '11'], a: 0, h: 'От 8 сделай 3 шага назад.' },
+         { q: 'Как правильно?', o: ['чудо', 'чюдо'], a: 0, h: 'ЧУ пиши с буквой У.' },
+         { q: 'Сколько слогов в слове МО-ЛО-КО?', o: ['2', '3', '4'], a: 1, h: 'Посчитай гласные.' },
+         { q: '14 … 11', o: ['>', '<', '='], a: 0, h: 'Клювик открыт к большему числу.' },
+         { q: 'Как правильно написать кличку собаки?', o: ['дружок', 'Дружок'], a: 1, h: 'Клички животных пишем с большой буквы.' }] },
+   win: [['k', 'Не-е-ет! Я та-а-аю…'],
+         ['n', 'Кляксус превратился в маленькую капельку чернил. Совушка посадила её в чернильницу — пусть теперь пишет только добрые слова.'],
+         ['e:👑:Король', 'Королевство Знаний спасено! Объявляю тебя Хранительницей Королевства!'],
+         ['o', 'Это была первая часть сказки. А впереди — новые приключения во 2 классе!']] }
+];
+
+var BOOK2 = [
+ { land: 'Королевская библиотека', color: '#FF8A3D', icon: '📚', subj: 'ru',
+   scenes: [
+    ['n', 'После победы над Кляксусом в королевстве был весёлый праздник. Но однажды утром небо стало серым и холодным.'],
+    ['k', 'Я — Колдунья Стиралка, сестра Кляксуса! Кляксы можно смыть, а я просто сотру всё, что вы знаете! Ха-ха!'],
+    ['n', 'Стиралка взмахнула огромным ластиком — и страницы Большой Книги Правил стали белыми и пустыми.'],
+    ['o', 'Привет, мой храбрый друг! Без Книги Правил королевство всё забудет. Нам нужно вернуть 12 страниц. Первая — в Королевской библиотеке.'],
+    ['e:👓:Библиотекарь Очкарик', 'Стиралка перемешала все книги! Их нужно расставить по алфавиту, а я забыл, как это делается…']],
+   lesson: { t: 'Алфавит', p: ['Алфавит — это все буквы, выстроенные по порядку. Их 33.', 'Слова в словаре стоят по алфавиту — по первой букве.', 'Если первые буквы одинаковые, смотрим на вторую букву.'], ex: 'арбуз, банан, вишня — А, Б, В.' },
+   quest: { intro: 'Помоги расставить книги! Каждый верный ответ — одна книга на полке.',
+    goal: { type: 'fill', n: 5, icon: '📕', ok: 'Книга на полке!' },
+    qs: [{ q: 'Какая буква идёт после буквы В?', o: ['Г', 'Б', 'Д'], a: 0, h: 'Скажи по порядку: А, Б, В…' },
+         { q: 'Какая буква стоит перед буквой М?', o: ['Н', 'Л', 'К'], a: 1, h: 'Вспомни кусочек алфавита: …К, Л, М, Н…' },
+         { q: 'Какое слово стоит первым по алфавиту?', o: ['мяч', 'арбуз', 'кот'], a: 1, h: 'Чья первая буква ближе к началу алфавита?' },
+         { q: 'Какое слово первое по алфавиту?', o: ['слон', 'сова'], a: 0, h: 'Первые буквы одинаковые. Сравни вторые: Л и О. Какая раньше?' },
+         { q: 'Сколько букв в русском алфавите?', o: ['30', '33', '26'], a: 1, h: 'Это число из двух одинаковых цифр.' }] },
+   win: [['e:👓:Библиотекарь Очкарик', 'Все книги на местах! А вот и первая страница Книги Правил — держи!'], ['o', 'Одна страница есть! Следующая спрятана в Городе Сотен.']] },
+
+ { land: 'Город Сотен', color: '#2A9DF4', icon: '🏙', subj: 'ma',
+   scenes: [
+    ['n', 'В Городе Сотен у каждого дома есть номер. Но Стиралка стёрла номера, и почтальон не может разнести письма.'],
+    ['e:🐕:Пёс-почтальон Тузик', 'Гав! Где дом 47? Где дом 74? Я всё перепутал!'],
+    ['o', 'Двузначные числа состоят из десятков и единиц. Узнаем секрет — и номера вернутся!']],
+   lesson: { t: 'Числа до 100', p: ['Числа до 100 записываются двумя цифрами.', 'Первая цифра — сколько десятков, вторая — сколько единиц.', '47 — это 4 десятка и 7 единиц. А 74 — 7 десятков и 4 единицы. Совсем другое число!'], ex: '58 = 50 + 8' },
+   quest: { intro: 'Верни номера пяти домам!',
+    goal: { type: 'fill', n: 5, icon: '🏠', ok: 'Номер вернулся!' },
+    qs: [{ q: 'Сколько десятков в числе 36?', o: ['3', '6', '36'], a: 0, h: 'Первая цифра — десятки.' },
+         { q: '5 десятков и 2 единицы — это…', o: ['25', '52', '7'], a: 1, h: 'Сначала пишем десятки, потом единицы.' },
+         { q: 'Какое число больше?', o: ['47', '74'], a: 1, h: 'Сравни десятки: 4 и 7.' },
+         { q: 'Какое число идёт после 59?', o: ['50', '60', '58'], a: 1, h: 'После 9 единиц начинается новый десяток.' },
+         { q: '40 + 6 = ?', o: ['46', '64', '10'], a: 0, h: '4 десятка и 6 единиц.' }] },
+   win: [['e:🐕:Пёс-почтальон Тузик', 'Гав-гав! Все письма доставлены! А в последнем конверте — страница Книги Правил!'], ['o', 'Отлично! Следующая страница — в Саду Проверок.']] },
+
+ { land: 'Сад Проверок', color: '#1FB59B', icon: '🌷', subj: 'ru',
+   scenes: [
+    ['n', 'В Саду Проверок растут волшебные цветы-слова. Стиралка стёрла в них гласные буквы.'],
+    ['e:🌻:Садовница Подсолнушка', 'Мои цветы вянут! Без гласных слова болеют. Кто знает, какую букву вписать?'],
+    ['o', 'Есть гласные-хитрюги: без ударения они звучат неясно. Но их можно проверить!']],
+   lesson: { t: 'Безударная гласная', p: ['В корне слова гласная без ударения слышится неясно: пишем ВОДА, а слышим «вада».', 'Чтобы проверить, измени слово так, чтобы эта гласная стала ударной.', 'Слово, которое помогает, называется проверочным.'], ex: 'вода — вОды, трава — трАвы, лиса — лИсы.' },
+   quest: { intro: 'Полей 5 цветков правильными буквами!',
+    goal: { type: 'fill', n: 5, icon: '🌷', ok: 'Цветок ожил!' },
+    qs: [{ q: 'Какая буква пропущена: в..да?', o: ['о', 'а'], a: 0, h: 'Измени слово: одна вода — много… Какая буква слышна ясно?' },
+         { q: 'Какая буква пропущена: тр..ва?', o: ['о', 'а'], a: 1, h: 'Измени слово: одна трава — много…' },
+         { q: 'Какая буква пропущена: л..са?', o: ['е', 'и'], a: 1, h: 'Измени слово: одна лиса — много…' },
+         { q: 'Какое слово проверочное для слова СТОЛЫ?', o: ['стол', 'столовая'], a: 0, h: 'В проверочном слове гласная стоит под ударением.' },
+         { q: 'Какая буква пропущена: гр..бы?', o: ['и', 'е'], a: 0, h: 'Измени слово: много грибов — один…' }] },
+   win: [['e:🌻:Садовница Подсолнушка', 'Цветы ожили! Смотри, в самом большом бутоне — страница Книги Правил!'], ['o', 'Ура! Теперь — на Рынок.']] },
+
+ { land: 'Шумный рынок', color: '#E2457F', icon: '🍉', subj: 'ma',
+   scenes: [
+    ['n', 'На рынке шумно: продают яблоки, орехи и арбузы. Но Стирашки — помощницы Стиралки — стёрли все ответы в счётах торговцев.'],
+    ['e:🦊:Лиса-торговка', 'Ой, беда! Я не могу дать сдачу покупателям! Стирашки мешают!'],
+    ['o', 'Прогоним Стирашек! Нам поможет счёт десятками и единицами.']],
+   lesson: { t: 'Сложение и вычитание до 100', p: ['Складываем двузначные числа по частям: десятки с десятками, единицы с единицами.', '34 + 25: 30 + 20 = 50, 4 + 5 = 9. Вместе 59.', 'Вычитаем так же: 58 − 23: 50 − 20 = 30, 8 − 3 = 5. Ответ 35.'], ex: '42 + 30 = 72     67 − 7 = 60' },
+   quest: { intro: 'Прогони 5 Стирашек с рынка!',
+    goal: { type: 'blots', n: 5, ok: 'Бах! Стирашка убежала!' },
+    qs: [{ q: '34 + 25 = ?', o: ['59', '69', '58'], a: 0, h: 'Сложи десятки: 30 и 20. Потом единицы: 4 и 5.' },
+         { q: '58 − 23 = ?', o: ['35', '25', '81'], a: 0, h: 'Из десятков вычти десятки, из единиц — единицы.' },
+         { q: '40 + 30 = ?', o: ['70', '7', '43'], a: 0, h: '4 десятка и ещё 3 десятка.' },
+         { q: '67 − 7 = ?', o: ['60', '0', '74'], a: 0, h: 'Убери все 7 единиц.' },
+         { q: '25 + 5 = ?', o: ['30', '20', '75'], a: 0, h: '5 единиц и ещё 5 — это целый новый десяток.' }] },
+   win: [['e:🦊:Лиса-торговка', 'Вот спасибо! Держи — эту страницу я нашла в корзине с яблоками!'], ['o', 'Следующая страница — у Звонкого водопада.']] },
+
+ { land: 'Звонкий водопад', color: '#3C8DBC', icon: '🏞', subj: 'ru',
+   scenes: [
+    ['n', 'У Звонкого водопада живут звонкие и глухие звуки. Они дружат парами.'],
+    ['k', 'А я перепутала все пары! Теперь никто не знает, что писать в конце слова: ДУБ или ДУП? Ха-ха!'],
+    ['e:🐟:Рыбка Серебрянка', 'Помогите! Стиралка заперла меня за решёткой у водопада!'],
+    ['o', 'Есть верный способ проверки. Сейчас покажу!']],
+   lesson: { t: 'Парные согласные', p: ['Есть пары звонких и глухих согласных: Б–П, В–Ф, Г–К, Д–Т, Ж–Ш, З–С.', 'На конце слова звонкая согласная звучит глухо: пишем ДУБ, а слышим «дуп».', 'Проверка: измени слово так, чтобы после согласной стояла гласная: дуб — дубы.'], ex: 'гриб — грибы, снег — снега, глаз — глаза.' },
+   quest: { intro: 'Решётку держат 4 замка. Открой их и спаси Рыбку!',
+    goal: { type: 'locks', n: 4, npc: '🐟', ok: 'Щёлк! Замок открыт!' },
+    qs: [{ q: 'Как правильно?', o: ['гриб', 'грип'], a: 0, h: 'Проверь: один гриб — много…' },
+         { q: 'Как правильно?', o: ['снег', 'снек'], a: 0, h: 'Проверь: много чего? Сне..а.' },
+         { q: 'Как правильно?', o: ['зуп', 'зуб'], a: 1, h: 'Проверь: один зуб — много…' },
+         { q: 'Как правильно?', o: ['глас', 'глаз'], a: 1, h: 'Проверь: один глаз — два…' }] },
+   win: [['e:🐟:Рыбка Серебрянка', 'Я свободна! Вот страница, которую Стиралка уронила в воду!'], ['o', 'Дальше — в Волшебную мастерскую!']] },
+
+ { land: 'Волшебная мастерская', color: '#7A5CF0', icon: '🔨', subj: 'ma',
+   scenes: [
+    ['n', 'В Волшебной мастерской делают игрушки для всего королевства. Но работа остановилась.'],
+    ['e:🐿:Белка-мастерица', 'Мне нужно собрать 5 коробок по 3 игрушки. Складывать долго, а праздник уже завтра!'],
+    ['o', 'Есть быстрый способ — умножение! Оно помогает считать одинаковые группы.']],
+   lesson: { t: 'Умножение', p: ['Умножение — это быстрое сложение одинаковых чисел.', 'Вместо 3 + 3 + 3 + 3 + 3 пишем 3 × 5.', 'Если поменять числа местами, ответ не изменится: 2 × 4 = 4 × 2.'], ex: '2 × 3 = 2 + 2 + 2 = 6' },
+   quest: { intro: 'Собери 5 коробок с игрушками!',
+    goal: { type: 'fill', n: 5, icon: '🎁', ok: 'Коробка готова!' },
+    qs: [{ q: '2 × 3 = ?', o: ['6', '5', '8'], a: 0, h: 'Сложи: 2 + 2 + 2.' },
+         { q: '3 + 3 + 3 + 3 — это…', o: ['3 × 4', '4 + 3', '3 × 3'], a: 0, h: 'Сколько раз повторяется тройка?' },
+         { q: '5 × 2 = ?', o: ['10', '7', '25'], a: 0, h: 'Сложи две пятёрки.' },
+         { q: '4 × 2 = 2 × …', o: ['4', '2', '8'], a: 0, h: 'Если поменять числа местами, ответ не меняется.' },
+         { q: '3 × 3 = ?', o: ['9', '6', '12'], a: 0, h: 'Сложи три тройки.' }] },
+   win: [['e:🐿:Белка-мастерица', 'Все игрушки готовы! А на дне коробки — страница Книги Правил!'], ['o', 'Следующая — в Снежной долине. Одевайся теплее!']] },
+
+ { land: 'Снежная долина', color: '#4FA9D6', icon: '❄', subj: 'ru',
+   scenes: [
+    ['n', 'В Снежной долине метёт метель. Стиралка стёрла все мягкие знаки, и слова стали колючими и холодными.'],
+    ['e:⛄:Снеговик Морковкин', 'Без мягкого знака КОНЬ превратился в КОН, а ЛИСТЬЯ — в ЛИСТЯ. Помоги!'],
+    ['o', 'У мягкого знака две работы. Слушай внимательно!']],
+   lesson: { t: 'Мягкий знак', p: ['Мягкий знак сам звука не обозначает. Он смягчает согласную перед собой: мел — мель, брат — брать.', 'Ещё бывает разделительный мягкий знак. Он стоит перед буквами Е, Ё, Ю, Я, И и, как стеночка, разделяет звуки.', 'Разделительный Ь: вьюга, листья, семья, соловьи.'], ex: 'конь, день, ель — смягчает. Вьюга, платье — разделяет.' },
+   quest: { intro: 'Разожги 5 тёплых костров в долине!',
+    goal: { type: 'fill', n: 5, icon: '🔥', ok: 'Костёр разгорелся!' },
+    qs: [{ q: 'Как правильно?', o: ['кон', 'конь'], a: 1, h: 'Звук [н] здесь мягкий. Кто его смягчает?' },
+         { q: 'Как правильно?', o: ['листя', 'листья'], a: 1, h: 'Перед Я здесь нужна стеночка-разделитель.' },
+         { q: 'Как правильно?', o: ['вьюга', 'вюга'], a: 0, h: 'Произнеси медленно: в-ЙУ-га. Звуки разделены.' },
+         { q: 'В каком слове мягкий знак смягчает согласную?', o: ['день', 'вьюга'], a: 0, h: 'Разделительный стоит перед Е, Ё, Ю, Я, И. А смягчающий — часто на конце слова.' },
+         { q: 'Как правильно?', o: ['лось', 'лос'], a: 0, h: 'Звук [с] на конце мягкий: лось.' }] },
+   win: [['e:⛄:Снеговик Морковкин', 'Слова снова тёплые и мягкие! Держи страницу — она была в сугробе.'], ['o', 'Половина пути пройдена! Дальше — Пекарня.']] },
+
+ { land: 'Пекарня', color: '#C9822B', icon: '🥧', subj: 'ma',
+   scenes: [
+    ['n', 'Из Пекарни пахнет пирожками. Но хозяйка стоит грустная.'],
+    ['e:🐰:Зайчиха-пекарь', 'Я испекла 12 пирожков для 3 зайчат. Как разделить их поровну? Стиралка стёрла у меня из головы деление!'],
+    ['o', 'Деление — это когда раздаём поровну. Это очень справедливое действие!']],
+   lesson: { t: 'Деление', p: ['Деление — это раздавание поровну.', '12 пирожков на 3 зайчат: каждому по 4. Пишем: 12 : 3 = 4.', 'Деление можно проверить умножением: 4 × 3 = 12. Всё верно!'], ex: '10 : 2 = 5, потому что 5 × 2 = 10.' },
+   quest: { intro: 'Разложи пирожки по 4 тарелкам!',
+    goal: { type: 'fill', n: 4, icon: '🥧', ok: 'Тарелка полная!' },
+    qs: [{ q: '12 : 3 = ?', o: ['4', '3', '9'], a: 0, h: 'Какое число умножить на 3, чтобы вышло 12?' },
+         { q: '10 : 2 = ?', o: ['5', '8', '20'], a: 0, h: 'Раздели 10 пальчиков на две руки.' },
+         { q: '8 пирожков на 2 зайчат. Сколько получит каждый?', o: ['4', '6', '10'], a: 0, h: 'Раздели 8 поровну на двоих.' },
+         { q: 'Какой знак у деления?', o: [':', '×', '+'], a: 0, h: 'Это две точки.' }] },
+   win: [['e:🐰:Зайчиха-пекарь', 'Всем поровну! Угощайся пирожком. А вот и страница — она лежала в книге рецептов!'], ['o', 'Следующая страница — в Корневом лесу.']] },
+
+ { land: 'Корневой лес', color: '#4E9F3D', icon: '🌲', subj: 'ru',
+   scenes: [
+    ['n', 'В Корневом лесу у каждого дерева-слова есть корень. Слова с одним корнем — одна семья.'],
+    ['k', 'А я поселила в эти семьи чужих! Пусть все перессорятся!'],
+    ['e:🦌:Олень Ветвистый', 'Помоги нам понять, кто здесь свой, а кто чужой!']],
+   lesson: { t: 'Родственные слова и корень', p: ['Родственные слова похожи и по звучанию, и по смыслу.', 'Их общая часть называется корень.', 'Бывают слова-обманщики: похожи, но по смыслу не родня. Лес и лестница — не родственники!'], ex: 'лес, лесок, лесник, лесной — корень ЛЕС.' },
+   quest: { intro: 'Прогони 5 Стирашек-обманщиц!',
+    goal: { type: 'blots', n: 5, ok: 'Бах! Обманщица убежала!' },
+    qs: [{ q: 'Какое слово НЕ родственник слову ВОДА?', o: ['водичка', 'водитель', 'подводный'], a: 1, h: 'Подумай: связано ли слово с водой по смыслу?' },
+         { q: 'Какой корень в словах: гриб, грибок, грибной?', o: ['гриб', 'ок', 'ной'], a: 0, h: 'Найди общую часть всех трёх слов.' },
+         { q: 'Какое слово родственное слову СНЕГ?', o: ['снежинка', 'сноп', 'санки'], a: 0, h: 'Какое слово тоже про снег?' },
+         { q: 'Какое слово лишнее?', o: ['сад', 'садовник', 'садиться'], a: 2, h: 'Одно слово про стул, а не про сад.' },
+         { q: 'Родственные слова — это слова…', o: ['с общим корнем и смыслом', 'которые просто похожи'], a: 0, h: 'Вспомни про лес и лестницу.' }] },
+   win: [['e:🦌:Олень Ветвистый', 'Все семьи помирились! Вот страница — она висела у меня на рогах!'], ['o', 'Скорее в Лабиринт Скобок!']] },
+
+ { land: 'Лабиринт Скобок', color: '#5B6B8C', icon: '🌀', subj: 'ma',
+   scenes: [
+    ['n', 'Дорога ведёт в Лабиринт Скобок. Чтобы пройти, нужно открывать двери, а на каждой — пример.'],
+    ['k', 'Ха! В моём лабиринте всё перепутано! Кто не знает порядка действий, заблудится навсегда!'],
+    ['o', 'Не заблудимся! У примеров есть свои правила очереди.']],
+   lesson: { t: 'Порядок действий', p: ['Если в примере есть скобки, сначала решаем то, что в скобках.', 'Если есть только плюс и минус, решаем по порядку слева направо.', 'Умножение и деление делаем раньше, чем сложение и вычитание.'], ex: '10 − (3 + 2) = 10 − 5 = 5' },
+   quest: { intro: 'Открой 5 дверей лабиринта!',
+    goal: { type: 'fill', n: 5, icon: '🚪', ok: 'Дверь открыта!' },
+    qs: [{ q: '10 − (3 + 2) = ?', o: ['5', '9', '15'], a: 0, h: 'Сначала скобки: 3 + 2.' },
+         { q: '8 − 2 + 3 = ?', o: ['9', '3', '13'], a: 0, h: 'По порядку: сначала 8 − 2, потом прибавь 3.' },
+         { q: '(4 + 6) − 5 = ?', o: ['5', '15', '3'], a: 0, h: 'Сначала скобки: 4 + 6.' },
+         { q: 'Что делаем сначала в примере 2 + 3 × 2?', o: ['сложение', 'умножение'], a: 1, h: 'Умножение — главнее.' },
+         { q: '2 + 3 × 2 = ?', o: ['8', '10', '7'], a: 0, h: 'Сначала 3 × 2, потом прибавь 2.' }] },
+   win: [['n', 'Последняя дверь открылась, и на полу лежала страница Книги Правил!'], ['o', 'Ты молодец! Теперь — в Королевскую школу.']] },
+
+ { land: 'Королевская школа', color: '#B5478A', icon: '🏫', subj: 'ru',
+   scenes: [
+    ['n', 'В Королевской школе слова-ученики собираются по командам. Но Стиралка стёрла таблички с названиями команд.'],
+    ['e:🦁:Учитель Лев Львович', 'Мои ученики не знают, в какую команду идти! Помоги их рассортировать.'],
+    ['o', 'Команд три: предметы, признаки и действия. Узнать команду поможет вопрос!']],
+   lesson: { t: 'Части речи', p: ['Слова-предметы отвечают на вопрос КТО? или ЧТО? Это имена существительные: кошка, мяч.', 'Слова-признаки отвечают на вопрос КАКОЙ? КАКАЯ? Это имена прилагательные: весёлый, синяя.', 'Слова-действия отвечают на вопрос ЧТО ДЕЛАТЬ? ЧТО ДЕЛАЕТ? Это глаголы: бежит, рисовать.'], ex: 'Рыжая (какая?) лиса (кто?) бежит (что делает?).' },
+   quest: { intro: 'Собери 5 медалей отличника!',
+    goal: { type: 'fill', n: 5, icon: '🏅', ok: 'Медаль твоя!' },
+    qs: [{ q: 'На какой вопрос отвечает слово ЗЕЛЁНЫЙ?', o: ['кто?', 'какой?', 'что делает?'], a: 1, h: 'Попробуй: зелёный — он кто? Или какой?' },
+         { q: 'Найди слово-действие:', o: ['прыгает', 'заяц', 'пушистый'], a: 0, h: 'Задай вопрос «что делает?».' },
+         { q: 'Найди слово-предмет:', o: ['синий', 'поёт', 'облако'], a: 2, h: 'Задай вопрос «что?».' },
+         { q: 'Слово КОШКА — это…', o: ['существительное', 'прилагательное', 'глагол'], a: 0, h: 'Кошка — кто? Это предмет.' },
+         { q: 'Слово РИСУЕТ — это…', o: ['существительное', 'прилагательное', 'глагол'], a: 2, h: 'Рисует — что делает?' }] },
+   win: [['e:🦁:Учитель Лев Львович', 'Все ученики в своих командах! Вот страница. Будь осторожна: Стиралка уже знает о тебе.'], ['o', 'Последняя страница — у Мастера Мер.']] },
+
+ { land: 'Дом Мастера Мер', color: '#E0A020', icon: '📏', subj: 'ma',
+   scenes: [
+    ['n', 'У подножия ледяной горы живёт Мастер Мер. Она знает, сколько всё длится и тянется.'],
+    ['e:🐢:Черепаха Неспешка', 'Стиралка стёрла мои линейки и часы! Я не знаю, долго ли идти до её замка и далеко ли.'],
+    ['o', 'Вспомним меры длины и времени — и найдём дорогу!']],
+   lesson: { t: 'Длина и время', p: ['1 дециметр = 10 сантиметров. 1 метр = 100 сантиметров.', 'В одном часе 60 минут, в сутках 24 часа.', 'Периметр — это длина дорожки вокруг фигуры. Складываем длины всех сторон.'], ex: 'Квадрат со стороной 2 см: 2 + 2 + 2 + 2 = 8 см.' },
+   quest: { intro: 'Почини 5 часов Мастера Мер!',
+    goal: { type: 'fill', n: 5, icon: '⏰', ok: 'Часы затикали!' },
+    qs: [{ q: '1 дм = … см', o: ['10', '100', '1'], a: 0, h: 'Дециметр — это десять сантиметров.' },
+         { q: 'Сколько минут в одном часе?', o: ['60', '100', '24'], a: 0, h: 'Большая стрелка проходит весь круг за час.' },
+         { q: 'Сколько сантиметров в 1 метре?', o: ['100', '10', '1000'], a: 0, h: 'В метре 10 дециметров, а в каждом — по 10 см.' },
+         { q: 'Периметр квадрата со стороной 3 см?', o: ['12 см', '9 см', '6 см'], a: 0, h: 'У квадрата 4 одинаковые стороны. Сложи их.' },
+         { q: 'Что длиннее?', o: ['1 м', '50 см'], a: 0, h: '1 метр — это 100 сантиметров.' }] },
+   win: [['e:🐢:Черепаха Неспешка', 'Часы тикают, линейки на месте! Последняя страница — твоя. А замок Стиралки — вон там, на ледяной горе.'], ['o', 'Все 12 страниц собраны! Осталось победить Стиралку.']] },
+
+ { land: 'Ледяной замок', color: '#3A2E5C', icon: '🏔', subj: 'all',
+   scenes: [
+    ['n', 'Ледяной замок сверкает на вершине горы. В тронном зале сидит Колдунья Стиралка.'],
+    ['k', 'Ты собрала все страницы?! Ну и что! Сейчас я задам тебе самые трудные вопросы — и сотру всё снова!'],
+    ['o', 'Ты знаешь все правила 2 класса. Я рядом. Вспомним главное — и в бой!']],
+   lesson: { t: 'Вспоминаем всё', p: ['Безударную гласную проверяй ударением: вода — вОды.', 'Парную согласную на конце проверяй гласной после неё: дуб — дубы.', 'Умножение — быстрое сложение. Деление — раздаём поровну.', 'Сначала скобки, потом умножение и деление, потом плюс и минус.', 'Предмет — кто? что? Признак — какой? Действие — что делает?'], ex: 'Ты всё это знаешь. Вперёд!' },
+   quest: { intro: 'Финальная битва! У Стиралки 6 сердечек. Каждый верный ответ отнимает одно!',
+    goal: { type: 'boss', n: 6, ok: 'Попала! Стиралка слабеет!' },
+    qs: [{ q: 'Какая буква пропущена: з..ма?', o: ['и', 'е'], a: 0, h: 'Измени слово: одна зима — много…' },
+         { q: '6 × 2 = ?', o: ['12', '8', '62'], a: 0, h: 'Сложи две шестёрки.' },
+         { q: 'Как правильно?', o: ['мороз', 'морос'], a: 0, h: 'Проверь: один мороз — сильные…' },
+         { q: '20 : 2 = ?', o: ['10', '18', '40'], a: 0, h: 'Раздели 20 поровну на двоих.' },
+         { q: 'Найди глагол:', o: ['читает', 'книга', 'интересная'], a: 0, h: 'Глагол отвечает на вопрос «что делает?».' },
+         { q: '(7 + 3) × 2 = ?', o: ['20', '13', '12'], a: 0, h: 'Сначала скобки: 7 + 3.' }] },
+   win: [['k', 'Ох-ох! Мой ластик сломался! Я больше не могу стирать…'],
+         ['n', 'Стиралка съёжилась и превратилась в маленький школьный ластик. Теперь она стирает только ошибки в тетрадках.'],
+         ['e:👑:Король', 'Большая Книга Правил снова целая! Ты — Великая Хранительница Королевства Знаний!'],
+         ['o', 'Ты прошла весь 2 класс! Я тобой очень горжусь!']] }
+];
+
+var BOOKS = [
+ { title: 'Королевство Знаний', part: 'Часть 1 · 1 класс', villain: 'Колдун Кляксус', vpre: 'Кляксус', minion: '', mname: 'Кляксёнок', icon: '🏰', color: '#7A5CF0', ch: BOOK1,
+   about: 'Колдун Кляксус заляпал королевство кляксами. Победи его!',
+   start: 'Колдун Кляксус заляпал Королевство Знаний кляксами! Пройди все земли и спаси королевство. Начнём с первой главы!',
+   cert: 'Хранительница Королевства Знаний,<br>победившая колдуна Кляксуса' },
+ { title: 'Книга Правил', part: 'Часть 2 · 2 класс', villain: 'Колдунья Стиралка', vpre: 'Стиралка', minion: 'eraser', mname: 'Стирашка', icon: '📖', color: '#E2457F', ch: BOOK2,
+   about: 'Колдунья Стиралка стёрла Большую Книгу Правил. Верни все страницы!',
+   start: 'Колдунья Стиралка, сестра Кляксуса, стёрла все страницы Большой Книги Правил! Верни 12 страниц и победи её!',
+   cert: 'Великая Хранительница Королевства Знаний,<br>победившая Колдунью Стиралку' }
+];
+var BOOK = 0, TALE = BOOK1;
+function pk(i) { return BOOK === 0 ? String(i) : BOOK + '-' + i; }
+function bookStars(b) { var s = 0; for (var k in TALEP) { var isB = b === 0 ? k.indexOf('-') < 0 : k.indexOf(b + '-') === 0; if (isB) s += TALEP[k]; } return s; }
+function bookDone(b) { var n = 0; for (var i = 0; i < BOOKS[b].ch.length; i++) if (TALEP[b === 0 ? String(i) : b + '-' + i]) n++; return n; }
+function openBook(b) { BOOK = b; TALE = BOOKS[b].ch; taleMap(); }
+function books() {
+  frame('Сказки', home);
+  var msg = 'Выбирай сказку! Первая — для 1 класса, вторая — для 2 класса. Можно начинать с любой.';
+  var top = el('div', 'owlrow', owl('small') + '<div class="bubble">' + msg + '</div>');
+  $('.owl', top).onclick = function () { say(msg); }; S.append(top);
+  var g = el('div', 'big');
+  BOOKS.forEach(function (B, b) {
+    var done = bookDone(b), all = B.ch.length;
+    var btn = el('button', 'bigbtn', '<div class="ic">' + B.icon + '</div><div><small class="bpart">' + B.part + '</small><h2>' + B.title + '</h2><p>' + B.about + '</p><p class="bprog">' + (done ? 'Пройдено глав: ' + done + ' из ' + all + ' · ★ ' + bookStars(b) : 'Ещё не начата') + '</p></div>');
+    btn.style.background = B.color; btn.onclick = function () { openBook(b); }; g.append(btn);
+  });
+  S.append(g); speak(msg);
+}
+
+var SUBJ = { ru: 'Русский язык', ma: 'Математика', all: 'Всё вместе' };
+var TAUNT = ['Хи-хи! Мимо!', 'Ха-ха! Не угадала!', 'Буль-буль! Ошибочка!'];
+function blotHTML(cls, hat) { return '<div class="blot ' + (cls || '') + '">' + (hat ? '<i class="hat"></i>' : '') + '</div>'; }
+function speaker(who) {
+  if (who === 'o') return { name: 'Совушка', por: owl('mini') };
+  if (who === 'k') return { name: BOOKS[BOOK].villain, por: blotHTML('mini ' + BOOKS[BOOK].minion, true), bad: true };
+  if (who === 'n') return { name: 'Сказочник', por: '<span>📖</span>' };
+  var p = who.split(':'); return { name: p[2], por: '<span>' + p[1] + '</span>' };
+}
+function taleUnlocked(i) { return i === 0 || !!TALEP[pk(i - 1)]; }
+function chapHead(i) {
+  var C = TALE[i];
+  var d = el('div', 'chead', '<span class="cnum" style="background:' + C.color + '">' + (i + 1) + '</span><div><b>Глава ' + (i + 1) + ' · ' + C.land + '</b><small>' + SUBJ[C.subj] + '</small></div>');
+  return d;
+}
+
+function taleMap() {
+  frame(BOOKS[BOOK].title, books);
+  var done = 0; for (var i = 0; i < TALE.length; i++) if (TALEP[pk(i)]) done++;
+  var msg = done === 0 ? BOOKS[BOOK].start
+    : done === TALE.length ? 'Ты спасла королевство! Можешь пройти любую главу ещё раз и собрать все звёзды.'
+    : 'Ты прошла глав: ' + done + ' из ' + TALE.length + '. Продолжим сказку?';
+  var top = el('div', 'owlrow', owl('small') + '<div class="bubble">' + msg + '</div>');
+  $('.owl', top).onclick = function () { say(msg); };
+  S.append(top);
+  var path = el('div', 'tpath');
+  TALE.forEach(function (C, i) {
+    var open = taleUnlocked(i), st = TALEP[pk(i)] || 0;
+    var b = el('button', 'tnode' + (open ? '' : ' locked') + (st ? ' done' : ''));
+    b.innerHTML = '<div class="ticon" style="background:' + C.color + '">' + (open ? C.icon : '🔒') + '</div>' +
+      '<div class="tinfo"><small>Глава ' + (i + 1) + ' · ' + SUBJ[C.subj] + '</small><b>' + C.land + '</b>' +
+      '<span class="st">' + (st ? '★'.repeat(st) + '<i>' + '★'.repeat(3 - st) + '</i>' : (open ? '<em>Начать ›</em>' : '<em>Сначала пройди прошлую главу</em>')) + '</span></div>';
+    b.onclick = function () { if (open) sceneView(i, TALE[i].scenes, 0, function () { lessonView(i); }); else { ding(false); shakeIt(b); } };
+    path.append(b);
+  });
+  S.append(path);
+  if (done === TALE.length) { var g = el('button', 'go', '🏆 Моя грамота'); g.style.marginTop = '16px'; g.onclick = certificate; S.append(g); }
+}
+
+function sceneView(i, list, k, after) {
+  var C = TALE[i]; frame(C.land, taleMap);
+  S.append(chapHead(i));
+  var sc = list[k], sp = speaker(sc[0]);
+  var card = el('div', 'scene' + (sp.bad ? ' bad' : ''));
+  card.style.borderTopColor = C.color;
+  card.innerHTML = '<div class="por">' + sp.por + '</div><div class="stext"><div class="sname">' + sp.name + '</div><p>' + sc[1] + '</p></div>';
+  $('.sname', card).append(sayBtn(function () { return sc[1]; }));
+  S.append(card);
+  var nav = el('div', 'snav');
+  var dots = el('div', 'dots'); for (var d = 0; d < list.length; d++) dots.append(el('span', d === k ? 'on' : ''));
+  var nx = el('button', 'go big', k < list.length - 1 ? 'Дальше ›' : 'Продолжить ›');
+  nx.onclick = function () { if (k < list.length - 1) sceneView(i, list, k + 1, after); else after(); };
+  nav.append(dots, nx); S.append(nav);
+  speak(sp.name + '. ' + sc[1]);
+}
+
+function lessonView(i) {
+  var C = TALE[i], L = C.lesson; frame(C.land, taleMap);
+  S.append(chapHead(i));
+  var card = el('div', 'card lesson');
+  card.innerHTML = '<div class="owlrow" style="margin:0 0 6px">' + owl('small') + '<div><span class="tag" style="background:' + C.color + '">Урок Совушки</span><h2>' + L.t + '</h2></div></div>';
+  L.p.forEach(function (p) { card.append(el('p', null, p)); });
+  card.append(el('div', 'example', '<b>Пример</b>' + L.ex));
+  var text = L.t + '. ' + L.p.join(' ') + ' Пример: ' + L.ex;
+  var ls = el('button', 'listen', '🔊 Послушать');
+  ls.onclick = function () { if (!say(text)) ls.textContent = 'Звук не поддерживается'; };
+  var go = el('button', 'go big', '⚔ К испытанию!'); go.onclick = function () { questView(i); };
+  var row = el('div', 'row'); row.append(ls, go); card.append(row);
+  S.append(card);
+  speak(text);
+}
+
+function questView(i) {
+  var C = TALE[i], Q = C.quest, G = Q.goal; frame(C.land, taleMap);
+  S.append(chapHead(i));
+  var st = { q: 0, oops: 0, p: 0 };
+  // arena
+  var ar = el('div', 'arena'); ar.style.borderColor = C.color;
+  var stage = el('div', 'stage'); var items = [];
+  if (G.type === 'blots') { for (var b = 0; b < G.n; b++) { var x = el('div', null, blotHTML(BOOKS[BOOK].minion)); items.push(x.firstChild); stage.append(x.firstChild); } }
+  else if (G.type === 'fill') { stage.className = 'stage slots'; for (var f = 0; f < G.n; f++) { var s = el('div', 'slot ' + (G.cls || '')); items.push(s); stage.append(s); } }
+  else if (G.type === 'locks') { stage.className = 'stage lockst';
+    var cage = el('div', 'cage', '<span class="npc">' + G.npc + '</span>'); stage.append(cage); var lr = el('div', 'locks');
+    for (var l = 0; l < G.n; l++) { var lk = el('span', 'lock', '🔒'); items.push(lk); lr.append(lk); } stage.append(lr); items.cage = cage; }
+  else if (G.type === 'boss') { stage.className = 'stage boss'; var bx = el('div', null, blotHTML('big ' + BOOKS[BOOK].minion, true)); items.boss = bx.firstChild; stage.append(items.boss);
+    var hr = el('div', 'hearts'); for (var h = 0; h < G.n; h++) { var ht = el('span', 'heart', '♥'); items.push(ht); hr.append(ht); } stage.append(hr); }
+  var taunt = el('div', 'taunt', '…');
+  ar.append(el('div', 'aintro', Q.intro), stage, taunt);
+  S.append(ar);
+  function progress() {
+    var k = st.p - 1;
+    if (G.type === 'blots') items[k].classList.add('gone');
+    else if (G.type === 'fill') { items[k].classList.add('full'); if (G.icon) items[k].textContent = G.icon; }
+    else if (G.type === 'locks') { items[k].textContent = '🔓'; items[k].classList.add('open'); if (st.p === G.n) items.cage.classList.add('free'); }
+    else if (G.type === 'boss') { items[k].classList.add('lost'); var bb = items.boss; bb.classList.remove('hit'); void bb.offsetWidth; bb.classList.add(st.p === G.n ? 'gone' : 'hit'); }
+  }
+  function sayTaunt() {
+    var t = pick(TAUNT); taunt.textContent = (G.type === 'boss' ? BOOKS[BOOK].vpre : BOOKS[BOOK].mname) + ': ' + t; taunt.classList.remove('on'); void taunt.offsetWidth; taunt.classList.add('on');
+    clearTimeout(sayTaunt.tm); sayTaunt.tm = setTimeout(function () { taunt.classList.remove('on'); }, 1800);
+  }
+  var qcard = el('div', 'card qcard'); S.append(qcard);
+  function renderQ() {
+    var q = Q.qs[st.q]; qcard.innerHTML = '';
+    var used = false;
+    var head = el('div', 'qhead', '<span class="prog">Вопрос ' + (st.q + 1) + ' из ' + Q.qs.length + '</span>');
+    var qt = el('p', 'qtext', q.q); qt.append(sayBtn(function () { return q.q + (q.o ? ' ' + q.o.join(', или ') : ''); }));
+    var msg = el('div', 'msg'); var hintBox = el('div');
+    qcard.append(head, qt);
+    function good() {
+      st.p++; progress(); ding(true); msg.className = 'msg ok'; msg.textContent = G.ok; speak(G.ok);
+      setTimeout(function () { st.q++; if (st.q < Q.qs.length) renderQ(); else finish(); }, 1100);
+    }
+    function bad(btn, text) {
+      st.oops++; ding(false); if (btn) shakeIt(btn); sayTaunt();
+      msg.className = 'msg bad'; msg.textContent = text || 'Не сдавайся! Подумай ещё или нажми «Подсказка».'; speak(msg.textContent);
+    }
+    if (q.type === 'pick') {
+      var sel = {}; var tiles = el('div', 'letters');
+      q.tiles.forEach(function (t) { var b = el('button', 'lt', t); b.onclick = function () { sel[t] = !sel[t]; b.classList.toggle('g1', sel[t]); }; tiles.append(b); });
+      var chk = el('button', 'go', 'Проверить');
+      chk.onclick = function () {
+        var picked = q.tiles.filter(function (t) { return sel[t]; });
+        var okk = picked.length === q.ok.length && picked.every(function (t) { return q.ok.indexOf(t) >= 0; });
+        if (okk) { chk.disabled = true; good(); } else bad(chk, picked.length < q.ok.length ? 'Ты нашла не все гласные. Поищи ещё!' : 'Среди выбранных есть согласная. Проверь!');
+      };
+      qcard.append(tiles, chk);
+    } else {
+      var opts = el('div', 'qopts' + (q.o.length === 2 ? ' two' : ''));
+      shuffle(q.o.map(function (o, k) { return { o: o, k: k }; })).forEach(function (it) {
+        var b = el('button', 'opt big', it.o);
+        b.onclick = function () {
+          if (b.disabled || qcard.dataset.lock === String(st.q)) return;
+          if (it.k === q.a) { qcard.dataset.lock = String(st.q); b.classList.add('right'); good(); }
+          else { b.classList.add('wrong'); b.disabled = true; bad(b); }
+        };
+        opts.append(b);
+      });
+      qcard.append(opts);
+    }
+    var hb = el('button', 'hbtn', '💡 Подсказка Совушки');
+    hb.onclick = function () { if (!used) { used = true; st.oops++; } hb.disabled = true; hintBox.innerHTML = '<div class="hintbox">🦉 ' + q.h + '</div>'; speak(q.h); };
+    var hrow = el('div', 'hints'); hrow.append(hb);
+    qcard.append(msg, hrow, hintBox);
+    if (st.q > 0) speak(q.q);
+  }
+  function finish() {
+    var stars = st.oops === 0 ? 3 : st.oops <= 2 ? 2 : 1;
+    TALEP[pk(i)] = Math.max(TALEP[pk(i)] || 0, stars); saveTale(); updTotal();
+    setTimeout(function () { sceneView(i, C.win, 0, function () { reward(i, stars); }); }, 700);
+  }
+  renderQ();
+  speak(Q.intro + ' ' + Q.qs[0].q);
+}
+
+function reward(i, stars) {
+  var C = TALE[i]; frame(C.land, taleMap);
+  var last = i === TALE.length - 1;
+  var card = el('div', 'card center');
+  card.innerHTML = owl() + '<h2 style="font-size:28px;margin:6px 0">' + (last ? 'Королевство спасено!' : 'Глава ' + (i + 1) + ' пройдена!') + '</h2>' +
+    '<div class="pstars">' + [0, 1, 2].map(function (k) { return k < stars ? '<span>★</span>' : '<span><i>★</i></span>'; }).join('') + '</div>' +
+    '<p style="font-weight:700">' + (stars === 3 ? 'Ни одной ошибки! Ты настоящая героиня!' : stars === 2 ? 'Отлично! Почти без ошибок.' : 'Получилось! Можно пройти ещё раз и собрать больше звёзд.') + '</p>';
+  var row = el('div', 'row'); row.style.justifyContent = 'center';
+  if (last) { var g = el('button', 'go big', '🏆 Моя грамота'); g.onclick = certificate; row.append(g);
+    if (BOOK === 0) { var p2 = el('button', 'go big', '📖 Часть 2'); p2.style.background = 'var(--berry)'; p2.onclick = function () { openBook(1); }; row.append(p2); } }
+  else { var n = el('button', 'go big', 'Следующая глава ›'); n.onclick = function () { sceneView(i + 1, TALE[i + 1].scenes, 0, function () { lessonView(i + 1); }); }; row.append(n); }
+  var m = el('button', 'listen', 'Карта сказки'); m.onclick = taleMap; row.append(m);
+  card.append(row); S.append(card);
+  speak($('h2', card).textContent + ' ' + $('p', card).textContent);
+}
+
+function certificate() {
+  frame('Грамота', taleMap);
+  var c = el('div', 'cert');
+  c.innerHTML = '<div class="ctop">' + BOOKS[BOOK].title + ' · ' + BOOKS[BOOK].part + '</div><h2>Грамота</h2><p>награждается</p>' +
+    '<input id="heroName" class="w" placeholder="впиши своё имя" maxlength="20">' +
+    '<p>' + BOOKS[BOOK].cert + '</p>' +
+    '<div class="pstars" style="font-size:36px">★ ' + bookStars(BOOK) + ' из ' + (TALE.length * 3) + '</div>' + owl('small') + '<p class="sig">Совушка и Король</p>';
+  S.append(c);
+  var inp = $('#heroName'); inp.value = HERO; inp.style.textTransform = 'none';
+  inp.oninput = function () { HERO = inp.value; saveTale(); };
+  speak('Грамота. Награждается ' + BOOKS[BOOK].cert.replace('<br>', ' '));
+}
+
+$('#voice').onclick = () => setVoice(!VOICE);
+if (VOICE) { const b = $('#voice'); b.textContent = '🔊 Говорит'; b.classList.add('on'); b.setAttribute('aria-pressed', 'true'); }
+updTotal(); home();
+</script>
+
+</body></html>
