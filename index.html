@@ -333,6 +333,19 @@ input.w.badd{border-color:var(--bad);background:var(--badbg)}
 .ob.ok{background:var(--okbg);box-shadow:inset 0 0 0 3px var(--ok)}
 .etext .tok{cursor:pointer}
 .opt[disabled]{cursor:default}
+
+/* ---- photos ---- */
+.ph{margin:0 0 12px;text-align:center}
+.ph img{display:block;width:100%;max-height:300px;object-fit:cover;border-radius:20px;box-shadow:0 4px 0 var(--sky2);cursor:zoom-in;background:#F2F7FC}
+.ph figcaption{font-size:12px;font-weight:700;color:var(--muted);margin-top:6px}
+.ph figcaption a{color:var(--muted)}
+.fe.hasimg{padding:0;overflow:hidden}
+.fe.hasimg img{width:100%;height:100%;object-fit:cover;display:block}
+.fact .fe.hasimg{cursor:zoom-in}
+.phview{position:fixed;inset:0;z-index:30;background:rgba(10,16,40,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;cursor:zoom-out}
+.phview img{max-width:100%;max-height:78vh;border-radius:16px;object-fit:contain}
+.phcap{color:#fff;font-weight:800;text-align:center;font-size:18px}
+.phcap small{font-weight:600;opacity:.75;font-size:14px}
 </style>
 
 <div class="wrap">
@@ -355,6 +368,7 @@ input.w.badd{border-color:var(--bad);background:var(--badbg)}
 </div>
 
 <script src="enc.js"></script>
+<script src="pics.js"></script>
 <script src="texts.js"></script>
 <script src="train.js"></script>
 <script>
@@ -653,6 +667,20 @@ let ENCREAD = {}, ENCSEEN = [];
 try { ENCREAD = JSON.parse(localStorage.getItem('sova-encread') || '{}'); ENCSEEN = JSON.parse(localStorage.getItem('sova-encseen') || '[]'); } catch (e) {}
 const saveEnc = () => { try { localStorage.setItem('sova-encread', JSON.stringify(ENCREAD)); localStorage.setItem('sova-encseen', JSON.stringify(ENCSEEN)); } catch (e) {} };
 const secOf = id => ENC_SECTIONS.find(x => x.id === id);
+const PIC = i => (typeof ENC_PICS !== 'undefined' && ENC_PICS[i]) || null;
+/* маленькая картинка с запасным эмодзи, если фото не загрузилось (нет интернета) */
+function picThumb(i, cls) {
+  const p = PIC(i), box = el('span', cls, ENC[i].e);
+  if (p) { const im = new Image(); im.alt = ''; im.loading = 'lazy'; im.onload = () => { box.textContent = ''; box.append(im); box.classList.add('hasimg'); }; im.src = p[0]; }
+  return box;
+}
+function photoView(i) {
+  const p = PIC(i); if (!p) return;
+  const o = el('div', 'phview');
+  const big = new Image(); big.alt = ENC[i].t; big.src = p[0].replace('/330px-', '/800px-'); big.onerror = () => { big.onerror = null; big.src = p[0]; };
+  const cap = el('div', 'phcap', `${ENC[i].e} ${ENC[i].t}<br><small>Нажми, чтобы закрыть</small>`);
+  o.append(big, cap); o.onclick = () => o.remove(); document.body.append(o);
+}
 /* Новый факт при каждом входе: берём тот, который ещё не показывали; когда все показаны — начинаем круг заново. */
 function pickNewFact() {
   let pool = ENC.map((_, i) => i).filter(i => ENCSEEN.indexOf(i) < 0);
@@ -667,6 +695,7 @@ function factCard() {
   const c = el('div', 'fact');
   c.innerHTML = `<div class="fk">🦉 Совушка знает интересный факт · ${sec.t}</div>
     <div class="fh"><div class="fe">${f.e}</div><div><h3>${f.t}</h3><p class="fa">${f.a}</p></div></div>`;
+  $('.fe', c).replaceWith(picThumb(TODAY, 'fe'));
   const row = el('div', 'frow');
   const bs = el('button', 'fbtn main', '🔊 Расскажи');
   const bm = el('button', 'fbtn', '📖 Подробно');
@@ -678,7 +707,8 @@ function factCard() {
     say(f.t + '. ' + f.a, null, () => { bs.classList.remove('speaking'); bs.textContent = '🔊 Расскажи'; });
   };
   bs.onclick = e => { e.stopPropagation(); tell(); };
-  p.onclick = $('.fe', c).onclick = $('h3', c).onclick = tell;
+  p.onclick = $('h3', c).onclick = tell;
+  $('.fe', c).onclick = () => PIC(TODAY) ? photoView(TODAY) : tell();
   bm.onclick = () => factPage(TODAY, home, true);
   bn.onclick = () => { stopSay(); TODAY = pickNewFact(); c.replaceWith(factCard()); };
   row.append(bs, bm, bn); c.append(row);
@@ -721,7 +751,8 @@ function factList(ids, back) {
   const l = el('div', 'flist');
   ids.forEach(i => {
     const f = ENC[i];
-    const b = el('button', 'fi', `<span class="fe">${f.e}</span><b>${f.t}</b>${ENCREAD[i] ? '<span class="ck">✔</span>' : ''}`);
+    const b = el('button', 'fi', `<b>${f.t}</b>${ENCREAD[i] ? '<span class="ck">✔</span>' : ''}`);
+    b.prepend(picThumb(i, 'fe'));
     b.onclick = () => factPage(i, back, false);
     l.append(b);
   });
@@ -742,6 +773,16 @@ function factPage(i, back, autoMore) {
   ENCREAD[i] = 1; saveEnc();
   const c = el('div', 'fpage');
   c.innerHTML = `<div class="big-e">${f.e}</div><h2>${f.t}</h2><span class="chipsec" style="background:${sec.c}">${sec.e} ${sec.t}</span>`;
+  const p = PIC(i);
+  if (p) {
+    const fig = el('figure', 'ph'); fig.hidden = true;
+    const im = new Image(); im.alt = f.t;
+    im.onload = () => { fig.hidden = false; $('.big-e', c).hidden = true; };
+    im.onerror = () => fig.remove();
+    im.src = p[0]; im.onclick = () => photoView(i);
+    const cap = el('figcaption', '', `🔍 Нажми на фото, чтобы увеличить · <a href="${p[1]}" target="_blank" rel="noopener">Фото: Викисклад</a> · <a href="${p[2]}" target="_blank" rel="noopener">Википедия</a>`);
+    fig.append(im, cap); $('.big-e', c).after(fig);
+  }
   const sp = splitSent(f.a), mp = splitSent(f.m);
   const short = el('div', 'short', sp.map(x => `<span>${x}</span>`).join(' '));
   const more = el('div', 'more', mp.map(x => `<span>${x}</span>`).join(' '));
